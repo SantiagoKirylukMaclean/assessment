@@ -23,7 +23,7 @@ public class Policie {
 
     @Column(name = "covered_name")
     @NotEmpty(message = "*Please provide your name")
-        private String coveredName;
+    private String coveredName;
 
     @Column(name = "covered_last_name")
     @NotEmpty(message = "*Please provide your last name")
@@ -33,4 +33,8 @@ public class Policie {
     @Email(message = "*Please provide a valid Email")
     @NotEmpty(message = "*Please provide your email")
     private String coveredLastEmail;
+
+    @ManyToOne
+    @JoinColumn(name="policie_insurance")
+    private Insurance insurance;
 }

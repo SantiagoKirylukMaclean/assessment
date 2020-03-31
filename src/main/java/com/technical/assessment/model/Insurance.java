@@ -5,6 +5,7 @@ import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
+import java.util.Calendar;
 import java.util.Set;
 
 @Data
@@ -22,7 +23,16 @@ public class Insurance {
     @NotEmpty(message = "*Please provide an name")
     private String name;
 
-    @OneToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER)
+    @Column(name = "address")
+    @Length(min = 5, message = "*Your name must have at least 5 characters")
+    @NotEmpty(message = "*Please provide an address")
+    private String address;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    private Calendar modifyDateTime;
+    /*
+    @OneToMany(cascade=CascadeType.ALL, fetch=FetchType.LAZY)
     private Set<Policie> policies;
+     */
 
 }
