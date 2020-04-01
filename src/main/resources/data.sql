@@ -11,9 +11,9 @@ INSERT INTO `role` VALUES (1,'ROLE_USER');
 INSERT INTO `role` VALUES (2,'ROLE_PM');
 INSERT INTO `role` VALUES (3,'ROLE_SUP');
 
-INSERT INTO insurance (name, address) VALUES ('Sallia','Gran via 123');
-INSERT INTO insurance (name, address) VALUES ('Rotular','Avinguda Diagonal 123');
-INSERT INTO insurance (name, address) VALUES ('Xenix','Marina 123');
+INSERT INTO insurance (name, address, modify_date_time) VALUES ('Sallia','Gran via 123','2020-04-02 08:00:00.000');
+INSERT INTO insurance (name, address, modify_date_time) VALUES ('Rotular','Avinguda Diagonal 123','2020-04-02 08:00:00.000');
+INSERT INTO insurance (name, address, modify_date_time) VALUES ('Xenix','Marina 123','2020-04-02 08:00:00.000');
 
 --Insert Users
 INSERT INTO user (username,email,password,name,last_name, active, insurance_id) VALUES ('john','john@nash.com','$2a$10$Y8me22Myj.xSG2HH5htIx.aQWW3mByPrd45ZTCKQqD4oyb..qcN3C', 'John', 'Nash',1,1);
@@ -43,28 +43,28 @@ INSERT INTO user_role (user_id, role_id) VALUES (8,2);
 INSERT INTO user_role (user_id, role_id) VALUES (9,3);
 
 --Insert Policies
-INSERT INTO policie (policie_description, covered_name, covered_last_name, covered_email, policie_insurance) VALUES ('Auto','Sergio','Almirón','Almiron@gmail.com',1);
-INSERT INTO policie (policie_description, covered_name, covered_last_name, covered_email, policie_insurance) VALUES ('Auto','Sergio','Batista','Batista@gmail.com',1);
-INSERT INTO policie (policie_description, covered_name, covered_last_name, covered_email, policie_insurance) VALUES ('Auto','Ricardo','Bochini','Bochini@gmail.com',1);
-INSERT INTO policie (policie_description, covered_name, covered_last_name, covered_email, policie_insurance) VALUES ('Auto','Claudio','Borghi','Borghi@gmail.com',1);
-INSERT INTO policie (policie_description, covered_name, covered_last_name, covered_email, policie_insurance) VALUES ('Auto','Jose','Brown','Brown@gmail.com',1);
-INSERT INTO policie (policie_description, covered_name, covered_last_name, covered_email, policie_insurance) VALUES ('Auto','Daniel','Pasarella','Pasarella@gmail.com',1);
-INSERT INTO policie (policie_description, covered_name, covered_last_name, covered_email, policie_insurance) VALUES ('Auto','Jorge','Burruchaga','Burruchaga@gmail.com',1);
-INSERT INTO policie (policie_description, covered_name, covered_last_name, covered_email, policie_insurance) VALUES ('Auto','Nestor','Clausen','Clausen@gmail.com',2);
-INSERT INTO policie (policie_description, covered_name, covered_last_name, covered_email, policie_insurance) VALUES ('Auto','Jose','Cuciuffo','Cuciuffo@gmail.com',2);
-INSERT INTO policie (policie_description, covered_name, covered_last_name, covered_email, policie_insurance) VALUES ('Auto','Diego','Maradona','Maradona@gmail.com',2);
-INSERT INTO policie (policie_description, covered_name, covered_last_name, covered_email, policie_insurance) VALUES ('Auto','Jorge','Valdano','Valdano@gmail.com',2);
-INSERT INTO policie (policie_description, covered_name, covered_last_name, covered_email, policie_insurance) VALUES ('Auto','Hector','Enrique','Enrique@gmail.com',2);
-INSERT INTO policie (policie_description, covered_name, covered_last_name, covered_email, policie_insurance) VALUES ('Auto','Oscar','Garre','Garre@gmail.com',2);
-INSERT INTO policie (policie_description, covered_name, covered_last_name, covered_email, policie_insurance) VALUES ('Auto','Ricardo','Giusti','Giusti@gmail.com',2);
-INSERT INTO policie (policie_description, covered_name, covered_last_name, covered_email, policie_insurance) VALUES ('Auto','Luis','Islas','Islas@gmail.com',3);
-INSERT INTO policie (policie_description, covered_name, covered_last_name, covered_email, policie_insurance) VALUES ('Auto','Julio','Olarticoechea','Olarticoechea@gmail.com',3);
-INSERT INTO policie (policie_description, covered_name, covered_last_name, covered_email, policie_insurance) VALUES ('Auto','Pedro','Pasculli','Pasculli@gmail.com',3);
-INSERT INTO policie (policie_description, covered_name, covered_last_name, covered_email, policie_insurance) VALUES ('Auto','Nery','Pumpido','Pumpido@gmail.com',3);
-INSERT INTO policie (policie_description, covered_name, covered_last_name, covered_email, policie_insurance) VALUES ('Auto','OScar','Ruggeri','Ruggeri@gmail.com',3);
-INSERT INTO policie (policie_description, covered_name, covered_last_name, covered_email, policie_insurance) VALUES ('Auto','Carlos','Tapia','Tapia@gmail.com',3);
-INSERT INTO policie (policie_description, covered_name, covered_last_name, covered_email, policie_insurance) VALUES ('Auto','Marcelo','Trobbiani','Trobbiani@gmail.com',3);
-INSERT INTO policie (policie_description, covered_name, covered_last_name, covered_email, policie_insurance) VALUES ('Auto','Hector','Zelada','Zelada@gmail.com',3);
+INSERT INTO policie (policie_description, covered_name, covered_last_name, covered_email, insurance_id) VALUES ('Car','Sergio','Almirón','Almiron@gmail.com',1);
+INSERT INTO policie (policie_description, covered_name, covered_last_name, covered_email, insurance_id) VALUES ('House','Sergio','Batista','Batista@gmail.com',1);
+INSERT INTO policie (policie_description, covered_name, covered_last_name, covered_email, insurance_id) VALUES ('Life','Ricardo','Bochini','Bochini@gmail.com',1);
+INSERT INTO policie (policie_description, covered_name, covered_last_name, covered_email, insurance_id) VALUES ('Car','Claudio','Borghi','Borghi@gmail.com',1);
+INSERT INTO policie (policie_description, covered_name, covered_last_name, covered_email, insurance_id) VALUES ('House','Jose','Brown','Brown@gmail.com',1);
+INSERT INTO policie (policie_description, covered_name, covered_last_name, covered_email, insurance_id) VALUES ('Life','Daniel','Pasarella','Pasarella@gmail.com',1);
+INSERT INTO policie (policie_description, covered_name, covered_last_name, covered_email, insurance_id) VALUES ('Car','Jorge','Burruchaga','Burruchaga@gmail.com',1);
+INSERT INTO policie (policie_description, covered_name, covered_last_name, covered_email, insurance_id) VALUES ('House','Nestor','Clausen','Clausen@gmail.com',2);
+INSERT INTO policie (policie_description, covered_name, covered_last_name, covered_email, insurance_id) VALUES ('Life','Jose','Cuciuffo','Cuciuffo@gmail.com',2);
+INSERT INTO policie (policie_description, covered_name, covered_last_name, covered_email, insurance_id) VALUES ('Car','Diego','Maradona','Maradona@gmail.com',2);
+INSERT INTO policie (policie_description, covered_name, covered_last_name, covered_email, insurance_id) VALUES ('House','Jorge','Valdano','Valdano@gmail.com',2);
+INSERT INTO policie (policie_description, covered_name, covered_last_name, covered_email, insurance_id) VALUES ('Life','Hector','Enrique','Enrique@gmail.com',2);
+INSERT INTO policie (policie_description, covered_name, covered_last_name, covered_email, insurance_id) VALUES ('Car','Oscar','Garre','Garre@gmail.com',2);
+INSERT INTO policie (policie_description, covered_name, covered_last_name, covered_email, insurance_id) VALUES ('House','Ricardo','Giusti','Giusti@gmail.com',2);
+INSERT INTO policie (policie_description, covered_name, covered_last_name, covered_email, insurance_id) VALUES ('Life','Luis','Islas','Islas@gmail.com',3);
+INSERT INTO policie (policie_description, covered_name, covered_last_name, covered_email, insurance_id) VALUES ('Car','Julio','Olarticoechea','Olarticoechea@gmail.com',3);
+INSERT INTO policie (policie_description, covered_name, covered_last_name, covered_email, insurance_id) VALUES ('House','Pedro','Pasculli','Pasculli@gmail.com',3);
+INSERT INTO policie (policie_description, covered_name, covered_last_name, covered_email, insurance_id) VALUES ('Life','Nery','Pumpido','Pumpido@gmail.com',3);
+INSERT INTO policie (policie_description, covered_name, covered_last_name, covered_email, insurance_id) VALUES ('Car','OScar','Ruggeri','Ruggeri@gmail.com',3);
+INSERT INTO policie (policie_description, covered_name, covered_last_name, covered_email, insurance_id) VALUES ('House','Carlos','Tapia','Tapia@gmail.com',3);
+INSERT INTO policie (policie_description, covered_name, covered_last_name, covered_email, insurance_id) VALUES ('Life','Marcelo','Trobbiani','Trobbiani@gmail.com',3);
+INSERT INTO policie (policie_description, covered_name, covered_last_name, covered_email, insurance_id) VALUES ('Car','Hector','Zelada','Zelada@gmail.com',3);
 --
 
 

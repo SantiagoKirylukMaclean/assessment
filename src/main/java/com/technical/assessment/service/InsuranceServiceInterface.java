@@ -12,6 +12,6 @@ import java.util.Optional;
 public interface InsuranceServiceInterface {
 
     List<Insurance> getAllInsurance();
-    Optional<Insurance> getInsuranceByUserName(String username);
+    ResponseEntity<Insurance> getInsuranceByUserName(String username);
     ResponseEntity<?> saveInsurance(Map<String, Object> updates, String id);
 }

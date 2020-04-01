@@ -6,18 +6,19 @@ import org.hibernate.validator.constraints.Length;
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
+import java.util.Calendar;
 
 @Data
 @Entity
 @Table(name = "policie")
 public class Policie {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "policie_id")
     private Long id;
 
     @Column(name = "policie_description")
-    @Length(min = 5, message = "*Your name must have at least 5 characters")
     @NotEmpty(message = "*Please provide an policie")
     private String policieDescription;
 
@@ -34,7 +35,10 @@ public class Policie {
     @NotEmpty(message = "*Please provide your email")
     private String coveredLastEmail;
 
+    @Temporal(TemporalType.TIMESTAMP)
+    private Calendar modifyDateTime;
+
     @ManyToOne
-    @JoinColumn(name="policie_insurance")
+    @JoinColumn(name = "insurance_id", referencedColumnName = "insurance_id")
     private Insurance insurance;
 }

@@ -3,6 +3,7 @@ package com.technical.assessment.controller;
 import com.technical.assessment.model.Insurance;
 import com.technical.assessment.security.jwt.JwtProvider;
 import com.technical.assessment.service.InsuranceServiceInterface;
+import io.swagger.models.auth.In;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -26,15 +27,18 @@ public class InsuranceController {
 
     @GetMapping("/insurances")
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_PM') or hasRole('ROLE_SUP')")
-    public Optional<Insurance> getAllInsurance(HttpServletRequest headers) {
+    public ResponseEntity<Insurance> getAllInsurance(HttpServletRequest headers) {
         String authHeader = headers.getHeader("Authorization");
         String user = jwtProvider.getUserNameFromJwtToken(authHeader.replace("Bearer ",""));
         return insuranceServiceInterface.getInsuranceByUserName(user);
     }
 
-    @RequestMapping(value = "/insurances/{id}", method = RequestMethod.PATCH, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> saveInsurance(@RequestBody Map<String, Object> updates, @PathVariable("id") String id) {
-        return insuranceServiceInterface.saveInsurance(updates, id);
+    @RequestMapping(value = "/insurances", method = RequestMethod.PATCH, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('ROLE_PM') or hasRole('ROLE_SUP')")
+    public ResponseEntity<?> saveInsurance(@RequestBody Map<String, Object> updates, HttpServletRequest headers) {
+        String authHeader = headers.getHeader("Authorization");
+        String user = jwtProvider.getUserNameFromJwtToken(authHeader.replace("Bearer ",""));
+        return insuranceServiceInterface.saveInsurance(updates, user);
     }
 
 

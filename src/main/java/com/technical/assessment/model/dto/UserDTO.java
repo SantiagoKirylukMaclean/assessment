@@ -1,5 +1,7 @@
-package com.technical.assessment.model;
+package com.technical.assessment.model.dto;
 
+import com.technical.assessment.model.Insurance;
+import com.technical.assessment.model.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,48 +18,33 @@ import java.util.Set;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
-@Table(name = "user")
-public class User {
+public class UserDTO {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
-    private Long id;
-
-    @Column(name = "username")
     @Length(min = 4, message = "*Your username must have at least 4 characters")
     @NotEmpty(message = "*Please provide an username")
     private String username;
 
-    @Column(name = "email")
+
     @Email(message = "*Please provide a valid Email")
     @NotEmpty(message = "*Please provide an email")
     private String email;
 
-    @Column(name = "password")
+
     @Length(min = 5, message = "*Your password must have at least 5 characters")
     @NotEmpty(message = "*Please provide your password")
     private String password;
 
-    @Column(name = "name")
+
     @NotEmpty(message = "*Please provide your name")
     private String name;
 
-    @Column(name = "last_name")
+
     @NotEmpty(message = "*Please provide your last name")
     private String lastName;
 
-    @Column(name = "active")
-    private int active;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Calendar modifyDateTime;
-
-
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "insurance_id", referencedColumnName = "insurance_id")
-    private Insurance insurance;
 
 
     @ManyToMany(cascade = CascadeType.ALL)

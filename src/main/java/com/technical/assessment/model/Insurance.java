@@ -19,7 +19,7 @@ public class Insurance {
     private Long id;
 
     @Column(name = "name")
-    @Length(min = 5, message = "*Your name must have at least 5 characters")
+    @Length(min = 1, message = "*Your name must have at least 1 characters")
     @NotEmpty(message = "*Please provide an name")
     private String name;
 
@@ -30,9 +30,6 @@ public class Insurance {
 
     @Temporal(TemporalType.TIMESTAMP)
     private Calendar modifyDateTime;
-    /*
-    @OneToMany(cascade=CascadeType.ALL, fetch=FetchType.LAZY)
-    private Set<Policie> policies;
-     */
+
 
 }

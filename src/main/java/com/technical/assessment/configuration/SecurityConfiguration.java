@@ -3,6 +3,7 @@ package com.technical.assessment.configuration;
 import com.technical.assessment.security.jwt.JwtAuthEntryPoint;
 import com.technical.assessment.security.jwt.JwtAuthTokenFilter;
 import com.technical.assessment.security.service.UserDetailsServiceImpl;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -86,6 +87,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                         "/configuration/security",
                         "/swagger-ui.html",
                         "/webjars/**");
+    }
+    @Bean
+    public ModelMapper modelMapper() {
+        return new ModelMapper();
     }
 
 
