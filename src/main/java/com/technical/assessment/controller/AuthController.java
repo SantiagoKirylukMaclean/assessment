@@ -1,6 +1,5 @@
 package com.technical.assessment.controller;
 
-
 import com.technical.assessment.model.dto.TokenDTO;
 import com.technical.assessment.model.dto.LoginDTO;
 import com.technical.assessment.service.AuthService;
@@ -10,21 +9,17 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
-
 @RestController
-@RequestMapping("/api/v1.0/auth")
+@RequestMapping("${api.version}")
 public class AuthController {
 
     @Autowired
     AuthService authService;
 
-    @RequestMapping(value = "/signin", method = RequestMethod.POST)
+    @PostMapping(value = "/auth/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginDTO loginRequest) {
-
         String jwt = authService.authUser(loginRequest);
         return ResponseEntity.ok(new TokenDTO(jwt, "Bearer"));
-
     }
-
 
 }
