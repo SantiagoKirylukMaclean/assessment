@@ -3,6 +3,7 @@ package com.technical.assessment.configuration;
 import com.technical.assessment.security.jwt.JwtAuthEntryPoint;
 import com.technical.assessment.security.jwt.JwtAuthTokenFilter;
 import com.technical.assessment.security.service.UserDetailsServiceImpl;
+import com.technical.assessment.utils.Utility;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -84,6 +85,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Bean
     public ModelMapper modelMapper() {
         return new ModelMapper();
+    }
+
+    @Bean
+    public Utility utility() {
+        return new Utility();
     }
 
 }

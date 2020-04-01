@@ -32,6 +32,9 @@ public class DefaultUserService implements UserServiceInterface {
     @Autowired
     InsuranceRepository insuranceRepository;
 
+    @Autowired
+    private Utility utility;
+
 
     public ResponseEntity<List<User>> getUsersByUserName(String username) {
 
@@ -75,7 +78,7 @@ public class DefaultUserService implements UserServiceInterface {
     }
 
     public ResponseEntity<?> saveUser(Map<String, Object> updates, String id){
-        Utility utility = Utility.getInstance();
+        //Utility utility = Utility.getInstance();
         try {
             User user = userRepository.findById(Long.parseLong(id)).get();
 

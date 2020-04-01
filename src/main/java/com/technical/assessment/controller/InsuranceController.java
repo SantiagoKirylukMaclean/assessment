@@ -3,45 +3,40 @@ package com.technical.assessment.controller;
 import com.technical.assessment.model.Insurance;
 import com.technical.assessment.security.jwt.JwtProvider;
 import com.technical.assessment.service.InsuranceServiceInterface;
-import io.swagger.models.auth.In;
+import com.technical.assessment.utils.Utility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/v1.0")
+@RequestMapping("${api.version}")
 public class InsuranceController {
 
     @Autowired
-    InsuranceServiceInterface insuranceServiceInterface;
+    private InsuranceServiceInterface insuranceServiceInterface;
 
     @Autowired
-    JwtProvider jwtProvider;
+    private JwtProvider jwtProvider;
+
+    @Autowired
+    private Utility utility;
 
     @GetMapping("/insurances")
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_PM') or hasRole('ROLE_SUP')")
     public ResponseEntity<Insurance> getAllInsurance(HttpServletRequest headers) {
-        String authHeader = headers.getHeader("Authorization");
-        String user = jwtProvider.getUserNameFromJwtToken(authHeader.replace("Bearer ",""));
-        return insuranceServiceInterface.getInsuranceByUserName(user);
+        return insuranceServiceInterface.getInsuranceByUserName(utility.getUserHeader(headers));
     }
 
-    @RequestMapping(value = "/insurances", method = RequestMethod.PATCH, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PatchMapping(value = "/insurances", consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('ROLE_PM') or hasRole('ROLE_SUP')")
     public ResponseEntity<?> saveInsurance(@RequestBody Map<String, Object> updates, HttpServletRequest headers) {
-        String authHeader = headers.getHeader("Authorization");
-        String user = jwtProvider.getUserNameFromJwtToken(authHeader.replace("Bearer ",""));
-        return insuranceServiceInterface.saveInsurance(updates, user);
+        return insuranceServiceInterface.saveInsurance(updates, utility.getUserHeader(headers));
     }
-
-
-
 
 }

@@ -11,13 +11,18 @@ import java.util.Map;
 public class Utility {
     private static final Utility INSTANCE = new Utility();
 
-    private Utility() {
+    public Utility() {
     }
 
-
+/*
     public static Utility getInstance() {
         return INSTANCE;
     }
+
+ */
+
+    @Autowired
+    private JwtProvider jwtProvider;
 
     public Object modifyField(Map<String, Object> updates, Object object){
         updates.forEach((k, v) -> {
@@ -28,6 +33,11 @@ public class Utility {
             }
         });
         return object;
+    }
+
+    public String getUserHeader(HttpServletRequest headers){
+        String authHeader = headers.getHeader("Authorization");
+        return jwtProvider.getUserNameFromJwtToken(authHeader.replace("Bearer ",""));
     }
 
 }

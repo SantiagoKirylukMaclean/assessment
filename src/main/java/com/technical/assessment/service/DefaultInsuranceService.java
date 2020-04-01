@@ -23,6 +23,9 @@ public class DefaultInsuranceService implements InsuranceServiceInterface {
     @Autowired
     UserServiceInterface userServiceInterface;
 
+    @Autowired
+    private Utility utility;
+
     public List<Insurance> getAllInsurance() {
         return insuranceRepository.findAll();
     }
@@ -44,7 +47,7 @@ public class DefaultInsuranceService implements InsuranceServiceInterface {
 
     public ResponseEntity<?> saveInsurance(Map<String, Object> updates, String username) {
         Optional<User> user = userServiceInterface.getUserByUserName(username);
-        Utility utility = Utility.getInstance();
+        //Utility utility = Utility.getInstance();
         try {
             Insurance insurance = insuranceRepository.findById(Long.parseLong(user.get().getInsurance().getId().toString())).get();
 

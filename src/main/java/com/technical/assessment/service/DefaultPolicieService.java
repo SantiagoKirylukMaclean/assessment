@@ -31,6 +31,9 @@ public class DefaultPolicieService implements PolicieServiceInterface {
     @Autowired
     UserServiceInterface userServiceInterface;
 
+    @Autowired
+    private Utility utility;
+
 
     @Autowired
     ModelMapper modelMapper;
@@ -68,7 +71,7 @@ public class DefaultPolicieService implements PolicieServiceInterface {
 
     public ResponseEntity<?> savePolicie(Map<String, Object> updates, String username, String policieId) {
         Optional<User> user = userServiceInterface.getUserByUserName(username);
-        Utility utility = Utility.getInstance();
+        //Utility utility = Utility.getInstance();
         try {
             Policie policie = policieRepository.findById(Long.parseLong(policieId)).get();
 
