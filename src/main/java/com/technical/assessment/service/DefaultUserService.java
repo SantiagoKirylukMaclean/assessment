@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -34,7 +35,7 @@ public class DefaultUserService implements UserServiceInterface {
     RoleRepository roleRepository;
 
     @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
     private Utility utility;
@@ -73,7 +74,7 @@ public class DefaultUserService implements UserServiceInterface {
         User userHeader = userRepository.findByUsername(username).get();
 
         User user = modelMapper.map(userDTO, User.class);
-        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setInsurance(insuranceRepository.findById(userHeader.getInsurance().getId()).get());
         user.setActive(1);
         user.setModifyDateTime(Calendar.getInstance());
