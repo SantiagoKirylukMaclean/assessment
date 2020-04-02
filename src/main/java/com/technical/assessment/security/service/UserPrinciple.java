@@ -42,7 +42,7 @@ public class UserPrinciple implements UserDetails {
 
     public static UserPrinciple build(User user) {
         List<GrantedAuthority> authorities = user.getRoles().stream().map(role ->
-                new SimpleGrantedAuthority(role.getRoles())
+                new SimpleGrantedAuthority(role.getRoleName())
         ).collect(Collectors.toList());
 
         return new UserPrinciple(

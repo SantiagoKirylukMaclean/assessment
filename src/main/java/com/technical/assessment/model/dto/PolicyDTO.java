@@ -10,7 +10,7 @@ import javax.validation.constraints.NotEmpty;
 
 @Data
 
-public class PolicieDTO {
+public class PolicyDTO {
 
     private String policieDescription;
 
@@ -18,6 +18,6 @@ public class PolicieDTO {
 
     private String coveredLastName;
 
-    private String coveredLastEmail;
+    private String coveredEmail;
 
 }

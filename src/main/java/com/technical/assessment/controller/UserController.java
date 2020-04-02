@@ -4,6 +4,7 @@ import com.technical.assessment.model.User;
 import com.technical.assessment.model.dto.UserDTO;
 import com.technical.assessment.security.jwt.JwtProvider;
 import com.technical.assessment.service.UserServiceInterface;
+import com.technical.assessment.utils.Utility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -15,41 +16,37 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/v1.0/insurance")
+@RequestMapping("${api.version}")
 public class UserController {
 
     @Autowired
-    UserServiceInterface userServiceInterface;
+    private UserServiceInterface userServiceInterface;
 
     @Autowired
-    JwtProvider jwtProvider;
+    private Utility utility;
 
-    @GetMapping("/user")
+    @GetMapping("/insurances/users")
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_PM') or hasRole('ROLE_SUP')")
     public ResponseEntity<List<User>> findAllUser(HttpServletRequest headers) {
-        return userServiceInterface.getUsersByUserName(this.getUserFromJwtHEader(headers));
+        return userServiceInterface.getUsersByUserName(utility.getUserHeader(headers));
     }
 
-    @RequestMapping(value = "/user", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping("/insurances/user/{id}")
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_PM') or hasRole('ROLE_SUP')")
+    public ResponseEntity<User> getUser(HttpServletRequest headers,
+                                       @PathVariable("id") String id) throws Exception {
+        return userServiceInterface.getUserByUserName(utility.getUserHeader(headers), id);
+    }
+
+    @PostMapping(value = "/insurances/user", consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('ROLE_PM') or hasRole('ROLE_SUP')")
     public ResponseEntity<?> addUser(@RequestBody UserDTO user, HttpServletRequest headers) {
-        return userServiceInterface.addUser(user, this.getUserFromJwtHEader(headers));
+        return userServiceInterface.addUser(user, utility.getUserHeader(headers));
     }
 
-    @RequestMapping(value = "/user2", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> addUser2(@RequestBody User user) {
-
-        return userServiceInterface.saveUser(user);
-    }
-
-    @RequestMapping(value = "/user/{id}", method = RequestMethod.PATCH, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> saveUSer(@RequestBody Map<String, Object> updates, @PathVariable("id") String id) {
+    @PatchMapping(value = "/insurances/user/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> saveUser(@RequestBody Map<String, Object> updates, @PathVariable("id") String id) {
         return userServiceInterface.saveUser(updates, id);
-    }
-
-    private String getUserFromJwtHEader(HttpServletRequest headers) {
-        String authHeader = headers.getHeader("Authorization");
-        return jwtProvider.getUserNameFromJwtToken(authHeader.replace("Bearer ", ""));
     }
 
 }

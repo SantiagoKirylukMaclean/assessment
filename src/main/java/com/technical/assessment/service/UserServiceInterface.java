@@ -14,7 +14,7 @@ public interface UserServiceInterface {
 
     ResponseEntity<List<User>> getUsersByUserName(String username);
     Optional<User> getUserByUserName(String username);
-    public ResponseEntity<?> addUser(UserDTO userDTO, String username);
+    ResponseEntity<User> getUserByUserName(String username, String id);
+    ResponseEntity<?> addUser(UserDTO userDTO, String username);
     ResponseEntity<?> saveUser(Map<String, Object> updates, String id);
-    ResponseEntity<?> saveUser(User user);
 }

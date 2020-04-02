@@ -11,7 +11,7 @@ import java.util.Calendar;
 @Data
 @Entity
 @Table(name = "policie")
-public class Policie {
+public class Policy {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,7 +33,7 @@ public class Policie {
     @Column(name = "covered_email")
     @Email(message = "*Please provide a valid Email")
     @NotEmpty(message = "*Please provide your email")
-    private String coveredLastEmail;
+    private String coveredEmail;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Calendar modifyDateTime;

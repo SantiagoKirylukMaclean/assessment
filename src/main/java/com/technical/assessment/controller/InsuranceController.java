@@ -33,7 +33,7 @@ public class InsuranceController {
         return insuranceServiceInterface.getInsuranceByUserName(utility.getUserHeader(headers));
     }
 
-    @PatchMapping(value = "/insurances", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PatchMapping(value = "/insurance", consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('ROLE_SUP')")
     public ResponseEntity<?> saveInsurance(@RequestBody Map<String, Object> updates, HttpServletRequest headers) {
         return insuranceServiceInterface.saveInsurance(updates, utility.getUserHeader(headers));
