@@ -12,6 +12,7 @@ import javax.persistence.Temporal;
 import javax.persistence.GenerationType;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.Calendar;
 
 @Data
@@ -34,6 +35,9 @@ public class Insurance {
 
     @NotEmpty(message = "*Please provide an address")
     private String address;
+
+    @NotNull(message = "*Please provide your automatic amount")
+    private Double automaticAcceptAmount;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Calendar modifyDateTime;

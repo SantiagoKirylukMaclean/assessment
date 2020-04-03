@@ -10,15 +10,15 @@ import java.util.Calendar;
 
 @Data
 @Entity
-@Table(name = "policie")
+@Table(name = "policy")
 public class Policy {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "policie_id")
+    @Column(name = "policy_id")
     private Long id;
 
-    @Column(name = "policie_description")
+    @Column(name = "policy_description")
     @NotEmpty(message = "*Please provide an policie")
     private String policieDescription;
 
