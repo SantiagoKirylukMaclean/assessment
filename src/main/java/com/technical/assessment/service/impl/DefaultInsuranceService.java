@@ -1,9 +1,11 @@
-package com.technical.assessment.service;
+package com.technical.assessment.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.technical.assessment.model.Insurance;
 import com.technical.assessment.model.User;
 import com.technical.assessment.repository.InsuranceRepository;
+import com.technical.assessment.service.InsuranceServiceInterface;
+import com.technical.assessment.service.UserServiceInterface;
 import com.technical.assessment.utils.Utility;
 import org.springframework.beans.factory.annotation.Autowired;
 

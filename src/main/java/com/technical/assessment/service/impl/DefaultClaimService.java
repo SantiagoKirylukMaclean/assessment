@@ -1,12 +1,12 @@
-package com.technical.assessment.service;
+package com.technical.assessment.service.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.scenario.effect.light.SpotLight;
 import com.technical.assessment.model.*;
 import com.technical.assessment.model.dto.ClaimRequestDTO;
+import com.technical.assessment.model.dto.CompensationResponseDTO;
+import com.technical.assessment.model.dto.OfferRequestDTO;
 import com.technical.assessment.model.dto.RejectRequestDTO;
-import com.technical.assessment.model.dto.UserDTO;
 import com.technical.assessment.repository.*;
+import com.technical.assessment.service.ClaimServiceInterface;
 import com.technical.assessment.utils.Utility;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -17,7 +17,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -52,7 +51,6 @@ public class DefaultClaimService implements ClaimServiceInterface {
 
     public ResponseEntity<List<Claim>> getClaimsByUserName(String username) {
         try {
-
             Optional<User> user = userRepository.findByUsername(username);
             List<Claim> claims = claimRepository.findAll();
             List<Claim> claims1 = claimRepository.findAll().stream()
@@ -67,7 +65,17 @@ public class DefaultClaimService implements ClaimServiceInterface {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
+    }
 
+    public ResponseEntity<Claim> getClaimsById(String headerUsername, String claimId) {
+        try {
+            Optional<User> headerUser = userRepository.findByUsername(headerUsername);
+            Claim claim = claimRepository.findById(Long.parseLong(claimId)).get();
+
+            return ResponseEntity.status(HttpStatus.OK).body(claim);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
     public ResponseEntity<List<Claim>> getClaimsGultyByUserName(String username) {
@@ -117,18 +125,19 @@ public class DefaultClaimService implements ClaimServiceInterface {
                if(policyGuilty.getInsurance().getId().equals(policyVictim.getInsurance().getId())){
                    log.info("Mismos Insurances");
                    setClaim(policyGuilty, policyVictim, claim, 3);
-                   setNegotiation(claim, "Same victim and guilty insurance, close automatic");
+                   setNegotiation(claim, "Same victim and guilty insurance, close automatic", claim.getAmount());
                }else if(Double.compare(claim.getAmount(),policyGuilty.getInsurance().getAutomaticAcceptAmount()) <= 0) {
                    log.info("monto ofertado es menor al automatico");
                    setClaim(policyGuilty, policyVictim, claim, 3);
-                   setNegotiation(claim, "Amount offered is less than automatic accept offer, close automatic");
+                   setNegotiation(claim, "Amount offered is less than automatic accept offer, close automatic", claim.getAmount());
                }else{
                    log.info("Inicio Tansaccion normal");
                    setClaim(policyGuilty, policyVictim, claim, 1);
-                   setNegotiation(claim, "Init claim");
+                   setNegotiation(claim, "Init claim", claim.getAmount());
                }
 
                 claimRepository.save(claim);
+
                 return ResponseEntity.status(HttpStatus.OK).body("Claim saved ok");
             }else {
                 log.debug("Insurance of header user is different than insurance victim policy");
@@ -143,13 +152,46 @@ public class DefaultClaimService implements ClaimServiceInterface {
         try {
             Optional<User> userHeader = userRepository.findByUsername(username);;
             Optional<Claim> claim = claimRepository.findById(Long.parseLong(claimId));
-            if (userHeader.get().getInsurance().getId().equals(claim.get().getPolicyGuilty().getInsurance().getId())){
-                log.info("el insurance del usuario logueado es igual al insurance de la poliza culpable");
-                updateClaim(claim.get(),2);
-                setNegotiation(claim.get(), rejectRequestDTO.getDescriptionMessage());
-            } else {
-                log.info("Insurance of header user is different than insurance victim policy");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(HttpStatus.BAD_REQUEST.getReasonPhrase());
+            Double lasAmountProposal = getlastAmountProposal(claim.get());
+            //Check if state is offered
+            if(claim.get().getState() == 1) {
+                if (userHeader.get().getInsurance().getId().equals(claim.get().getPolicyGuilty().getInsurance().getId())) {
+                    log.info("el insurance del usuario logueado es igual al insurance de la poliza culpable");
+                    updateClaim(claim.get(), 2);
+                    setNegotiation(claim.get(), rejectRequestDTO.getDescriptionMessage(), lasAmountProposal);
+                } else {
+                    log.info("Insurance of header user is different than insurance victim policy");
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(HttpStatus.BAD_REQUEST.getReasonPhrase());
+                }
+            }else{
+                log.info("El monto ofrecido es mayo o igual al ultimo negociado");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El estado de el reclamo tiene que ser ofertado para poder rechazar");
+            }
+            claimRepository.save(claim.get());
+            return ResponseEntity.status(HttpStatus.OK).body("Claim saved ok");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    public ResponseEntity<?> reachClaim(String claimId, RejectRequestDTO rejectRequestDTO, String username) {
+        try {
+            Optional<User> userHeader = userRepository.findByUsername(username);;
+            Optional<Claim> claim = claimRepository.findById(Long.parseLong(claimId));
+            Double lastAmountProposal = getlastAmountProposal(claim.get());
+            //Check if state is offered
+            if(claim.get().getState() == 1) {
+                if (userHeader.get().getInsurance().getId().equals(claim.get().getPolicyGuilty().getInsurance().getId())) {
+                    log.info("el insurance del usuario logueado es igual al insurance de la poliza culpable");
+                    updateClaim(claim.get(), 3);
+                    setNegotiation(claim.get(), rejectRequestDTO.getDescriptionMessage(), lastAmountProposal);
+                } else {
+                    log.info("Insurance of header user is different than insurance victim policy");
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(HttpStatus.BAD_REQUEST.getReasonPhrase());
+                }
+            }else{
+                log.info("El monto ofrecido es mayo o igual al ultimo negociado");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El estado de el reclamo tiene que ser ofertado para poder rechazar");
             }
 
             claimRepository.save(claim.get());
@@ -157,10 +199,45 @@ public class DefaultClaimService implements ClaimServiceInterface {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
+    }
 
+    public ResponseEntity<?> proposalClaim(String claimId, OfferRequestDTO offerRequestDTO, String username) {
+        try {
+            Optional<User> userHeader = userRepository.findByUsername(username);;
+            Optional<Claim> claim = claimRepository.findById(Long.parseLong(claimId));
+            Double lasAmountProposal = getlastAmountProposal(claim.get());
+            //Check if state is ejected
+            if(claim.get().getState() == 2){
+            //Check is loggerd user have same insurace than policy victim
+                if (userHeader.get().getInsurance().getId().equals(claim.get().getPolicyVictim().getInsurance().getId())){
+                    //Check is proposal amount is beyond las proposal amount
+                    if(Double.compare(offerRequestDTO.getAmount(), lasAmountProposal) < 0 ){
+                        log.info("El monto ofrecido es menor al ultimo negociado");
+                        updateClaim(claim.get(),1);
+                        setNegotiation(claim.get(), offerRequestDTO.getDescriptionMessage(), offerRequestDTO.getAmount());
+                    }else{
+                        log.info("El monto ofrecido es mayo o igual al ultimo negociado");
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Monto ofrecido menos");
+                    }
+                } else {
+                    log.info("Insurance of header user is different than insurance victim policy");
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(HttpStatus.BAD_REQUEST.getReasonPhrase());
+                }
+            }else{
+                log.info("El monto ofrecido es mayo o igual al ultimo negociado");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El estado de el reclamo tiene que ser rechazado para poder ofertar");
+            }
+            claimRepository.save(claim.get());
+            return ResponseEntity.status(HttpStatus.OK).body("Claim saved ok");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 
 
+    private Double getlastAmountProposal(Claim claim) {
+        return claim.getNegotiations().stream().max(Comparator.comparing(Negotiation::getId)).get().getAmount();
+    }
 
     private void setClaim(Policy policyGuilty, Policy policyVictim, Claim claim, int status){
         claim.setPolicyGuilty(policyGuilty);
@@ -174,11 +251,13 @@ public class DefaultClaimService implements ClaimServiceInterface {
         claim.setModifyDateTime(Calendar.getInstance());
     }
 
-    private void setNegotiation(Claim claim, String descritionMessage){
+    private void setNegotiation(Claim claim, String descritionMessage, Double negotiationAmount){
         Set<Negotiation> negotiations = new HashSet<>();
-        negotiations.addAll(claim.getNegotiations());
+        if (claim.getNegotiations() != null) {
+            negotiations.addAll(claim.getNegotiations());
+        }
         Negotiation negotiation = new Negotiation();
-        negotiation.setAmount(claim.getAmount());
+        negotiation.setAmount(negotiationAmount);
         negotiation.setDescriptionMessage(descritionMessage);
         negotiation.setModifyDateTime(Calendar.getInstance());
         negotiations.add(negotiation);

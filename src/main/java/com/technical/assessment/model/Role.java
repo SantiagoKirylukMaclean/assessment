@@ -13,7 +13,6 @@ import javax.persistence.GenerationType;
 @Data
 @Entity
 @Table(name = "role")
-
 public class Role {
 
     @Id

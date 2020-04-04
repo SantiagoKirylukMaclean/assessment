@@ -2,39 +2,26 @@ package com.technical.assessment;
 
 import com.technical.assessment.model.Policy;
 import com.technical.assessment.repository.PolicyRepository;
+import com.technical.assessment.service.impl.DefaultPolicyService;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.ResponseEntity;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 public class PoliciesTest {
 
     @Autowired
-    private TestEntityManager entityManager;
+    private DefaultPolicyService defaultPolicyService;
 
-    @Autowired
-    private PolicyRepository policyRepository;
-
-    /*
+    @DisplayName("Test Spring @Autowired Integration")
     @Test
-    public void whenFindByName_thenReturnEmployee() {
-        // given
-        Policy policy = new Policy();
-        policy.setCoveredEmail("");
-        policy.setCoveredName("");
-        policy.setCoveredLastName("");
-        policy.setPolicieDescription("");
-
-        entityManager.persist(alex);
-        entityManager.flush();
-
-        // when
-        Employee found = employeeRepository.findByName(alex.getName());
-
-        // then
-        assertThat(found.getName())
-                .isEqualTo(alex.getName());
+    void testGet() {
+        assertEquals("ResponseEntity", defaultPolicyService.getPolicyByUsername("ronald"));
     }
-     */
 }

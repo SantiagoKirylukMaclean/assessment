@@ -1,4 +1,4 @@
-package com.technical.assessment.service;
+package com.technical.assessment.service.impl;
 
 
 import com.technical.assessment.model.dto.LoginDTO;

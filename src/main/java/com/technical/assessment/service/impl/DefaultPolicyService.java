@@ -1,4 +1,4 @@
-package com.technical.assessment.service;
+package com.technical.assessment.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.technical.assessment.model.Policy;
@@ -6,6 +6,8 @@ import com.technical.assessment.model.User;
 import com.technical.assessment.model.dto.PolicyDTO;
 import com.technical.assessment.repository.InsuranceRepository;
 import com.technical.assessment.repository.PolicyRepository;
+import com.technical.assessment.service.PolicyServiceInterface;
+import com.technical.assessment.service.UserServiceInterface;
 import com.technical.assessment.utils.Utility;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;

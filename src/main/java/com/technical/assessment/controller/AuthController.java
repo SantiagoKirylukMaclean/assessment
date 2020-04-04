@@ -2,7 +2,7 @@ package com.technical.assessment.controller;
 
 import com.technical.assessment.model.dto.TokenDTO;
 import com.technical.assessment.model.dto.LoginDTO;
-import com.technical.assessment.service.AuthService;
+import com.technical.assessment.service.impl.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
