@@ -1,10 +1,8 @@
 package com.technical.assessment.model.dto;
 
 
-import com.technical.assessment.model.Role;
 import lombok.Data;
 
-import java.util.Calendar;
 import java.util.Set;
 
 @Data
