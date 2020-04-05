@@ -1,9 +1,7 @@
 package com.technical.assessment.security.jwt;
 
 
-
-
-import com.technical.assessment.security.service.UserPrinciple;
+import com.technical.assessment.security.service.UserPrincipleService;
 import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,7 +25,7 @@ public class JwtProvider {
 
     public String generateJwtToken(Authentication authentication) {
 
-        UserPrinciple sellerPrincipal = (UserPrinciple) authentication.getPrincipal();
+        UserPrincipleService sellerPrincipal = (UserPrincipleService) authentication.getPrincipal();
 
 
         return Jwts.builder()
@@ -37,16 +35,7 @@ public class JwtProvider {
                 .signWith(SignatureAlgorithm.HS512, jwtSecret)
                 .compact();
     }
-    /*
-    public String generateTokenClient(Payment payment) {
-        return Jwts.builder()
-                .setSubject((payment.getSeller()))
-                .setIssuedAt(new Date())
-                .setExpiration(new Date((new Date()).getTime() + jwtExpirationClient))
-                .signWith(SignatureAlgorithm.HS512, jwtSecret)
-                .compact();
-    }
-*/
+
     public String getUserNameFromJwtToken(String token) {
         return Jwts.parser()
                 .setSigningKey(jwtSecret)

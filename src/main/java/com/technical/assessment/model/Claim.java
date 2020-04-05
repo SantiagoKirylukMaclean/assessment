@@ -1,8 +1,6 @@
 package com.technical.assessment.model;
 
 import lombok.Data;
-
-
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -16,7 +14,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.CascadeType;
 import javax.persistence.FetchType;
-
 import javax.validation.constraints.NotNull;
 import java.util.Calendar;
 import java.util.Set;

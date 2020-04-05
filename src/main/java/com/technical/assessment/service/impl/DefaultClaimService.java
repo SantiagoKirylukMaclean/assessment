@@ -54,7 +54,7 @@ public class DefaultClaimService implements ClaimServiceInterface {
     public ResponseEntity<List<Claim>> getClaimsByUserName(String username) {
         try {
             Optional<User> user = userRepository.findByUsername(username);
-            List<Claim> claims = claimRepository.findAll();
+
             List<Claim> claims1 = claimRepository.findAll().stream()
                     .filter(cg -> cg.getPolicyGuilty().getInsurance().getId().equals(user.get().getInsurance().getId())).
                             collect(Collectors.toList());

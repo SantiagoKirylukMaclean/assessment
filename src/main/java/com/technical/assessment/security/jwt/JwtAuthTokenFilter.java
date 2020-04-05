@@ -1,9 +1,7 @@
 package com.technical.assessment.security.jwt;
 
 
-import com.technical.assessment.security.service.UserDetailsServiceImpl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.technical.assessment.security.service.DefaultUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,49 +18,47 @@ import java.io.IOException;
 
 public class JwtAuthTokenFilter extends OncePerRequestFilter {
 
-@Autowired
-private JwtProvider tokenProvider;
+    @Autowired
+    private JwtProvider tokenProvider;
 
-@Autowired
-private UserDetailsServiceImpl userDetailsService;
+    @Autowired
+    private DefaultUserDetailsService userDetailsService;
 
-@Autowired
-private UserDetailsServiceImpl defaultSellerDetailsService;
+    @Autowired
+    private DefaultUserDetailsService defaultSellerDetailsService;
 
-private static final Logger logger = LoggerFactory.getLogger(JwtAuthTokenFilter.class);
+    @Override
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain)
+            throws ServletException, IOException {
+        try {
 
-@Override
-protected void doFilterInternal(HttpServletRequest request,
-                                HttpServletResponse response,
-                                FilterChain filterChain)
-        throws ServletException, IOException {
-    try {
+            String jwt = getJwt(request);
+            if (jwt != null && tokenProvider.validateJwtToken(jwt)) {
+                String username = tokenProvider.getUserNameFromJwtToken(jwt);
 
-        String jwt = getJwt(request);
-        if (jwt!=null && tokenProvider.validateJwtToken(jwt)) {
-            String username = tokenProvider.getUserNameFromJwtToken(jwt);
+                UserDetails userDetails = defaultSellerDetailsService.loadUserByUsername(username);
+                UsernamePasswordAuthenticationToken authentication
+                        = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-            UserDetails userDetails = defaultSellerDetailsService.loadUserByUsername(username);
-            UsernamePasswordAuthenticationToken authentication
-                    = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
+        } catch (Exception e) {
+            logger.error("Can NOT set user authentication -> Message: {}", e);
         }
-    } catch (Exception e) {
-        logger.error("Can NOT set user authentication -> Message: {}", e);
+
+        filterChain.doFilter(request, response);
     }
 
-    filterChain.doFilter(request, response);
-}
+    private String getJwt(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
 
-private String getJwt(HttpServletRequest request) {
-    String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            return authHeader.replace("Bearer ", "");
+        }
 
-    if (authHeader != null && authHeader.startsWith("Bearer ")) {
-        return authHeader.replace("Bearer ","");
+        return null;
     }
-
-    return null;
-}
 }

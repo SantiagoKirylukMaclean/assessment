@@ -22,6 +22,6 @@ public class PoliciesTest {
     @DisplayName("Test Spring @Autowired Integration")
     @Test
     void testGet() {
-        assertEquals("ResponseEntity", defaultPolicyService.getPolicyByUsername("ronald"));
+        assertEquals("ResponseEntity", defaultPolicyService.getPoliciesByUsername("ronald"));
     }
 }

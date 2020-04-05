@@ -13,6 +13,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.JoinColumn;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
 import java.util.Calendar;
 
 @Data
@@ -25,14 +26,17 @@ public class Policy {
     @Column(name = "policy_id")
     private Long id;
 
+    @Size(max = 128)
     @Column(name = "policy_description")
     @NotEmpty(message = "*Please provide an policie")
     private String policieDescription;
 
+    @Size(max = 128)
     @Column(name = "covered_name")
     @NotEmpty(message = "*Please provide your name")
     private String coveredName;
 
+    @Size(max = 128)
     @Column(name = "covered_last_name")
     @NotEmpty(message = "*Please provide your last name")
     private String coveredLastName;

@@ -9,17 +9,6 @@ import java.lang.reflect.Field;
 import java.util.Map;
 
 public class Utility {
-    private static final Utility INSTANCE = new Utility();
-
-    public Utility() {
-    }
-
-/*
-    public static Utility getInstance() {
-        return INSTANCE;
-    }
-
- */
 
     @Autowired
     private JwtProvider jwtProvider;
@@ -39,5 +28,4 @@ public class Utility {
         String authHeader = headers.getHeader("Authorization");
         return jwtProvider.getUserNameFromJwtToken(authHeader.replace("Bearer ",""));
     }
-
 }
