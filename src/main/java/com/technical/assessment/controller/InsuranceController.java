@@ -1,4 +1,3 @@
-
 package com.technical.assessment.controller;
 
 import com.technical.assessment.model.Insurance;

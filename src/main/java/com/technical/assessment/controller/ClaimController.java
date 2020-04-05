@@ -88,7 +88,7 @@ public class ClaimController {
 
     @PostMapping(value = "/insurances/user", consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('ROLE_PM') or hasRole('ROLE_SUP')")
-    public ResponseEntity<?> addUser(@RequestBody UserDTO user, HttpServletRequest headers) {
+    public ResponseEntity<?> addUser(@RequestBody UserRequestDTO user, HttpServletRequest headers) {
         return userServiceInterface.addUser(user, utility.getUserHeader(headers));
     }
 

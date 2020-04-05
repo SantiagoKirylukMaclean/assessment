@@ -7,7 +7,7 @@ import java.util.Set;
 
 @Data
 
-public class UserDTO {
+public class UserRequestDTO {
 
     private String name;
     private String lastName;
