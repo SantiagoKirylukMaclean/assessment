@@ -2,7 +2,8 @@ package com.technical.assessment.controller;
 
 import com.technical.assessment.model.dto.TokenDTO;
 import com.technical.assessment.model.dto.LoginDTO;
-import com.technical.assessment.service.impl.AuthService;
+import com.technical.assessment.service.AuthServiceInterface;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,11 +15,16 @@ import javax.validation.Valid;
 public class AuthController {
 
     @Autowired
-    AuthService authService;
+    private AuthServiceInterface authServiceInterface;
+
+    public AuthController(AuthServiceInterface authServiceInterface) {
+        this.authServiceInterface = authServiceInterface;
+    }
 
     @PostMapping(value = "/auth/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginDTO loginRequest) {
-        String jwt = authService.authUser(loginRequest);
+        String jwt = authServiceInterface.authUser(loginRequest);
+
         return ResponseEntity.ok(new TokenDTO(jwt, "Bearer"));
     }
 
