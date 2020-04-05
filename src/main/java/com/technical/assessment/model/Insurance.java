@@ -30,9 +30,6 @@ public class Insurance {
     @NotEmpty(message = "*Please provide an name")
     private String name;
 
-    @Column(name = "address")
-    @Length(min = 5, message = "*Your Address must have at least 5 characters")
-
     @NotEmpty(message = "*Please provide an address")
     private String address;
 

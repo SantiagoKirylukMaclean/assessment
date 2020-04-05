@@ -43,7 +43,6 @@ public class PoliciyController {
         for (Policy policy : policiesResponse) {
             policesResponseDTO.add(modelMapper.map(policy, PolicyResponseDTO.class));
         }
-        //List<PolicyResponseDTO> policesResponseDTO = modelMapper.map(policiesResponse,List<PolicyResponseDTO.class>);
         return policesResponseDTO;
     }
 

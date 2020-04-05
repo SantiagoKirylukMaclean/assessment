@@ -48,6 +48,6 @@ public class InsuranceTest {
     @Test
     public void TrackingNullWeightTest() {
 
-        assertEquals(1,defaultInsuranceService.getAllInsurance().size());
+        assertEquals(1,defaultInsuranceService.getInsuranceByUserName("Sallia"));
     }
 }

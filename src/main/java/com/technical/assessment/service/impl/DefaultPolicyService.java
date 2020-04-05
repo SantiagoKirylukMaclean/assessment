@@ -35,7 +35,6 @@ public class DefaultPolicyService implements PolicyServiceInterface {
     @Autowired
     ModelMapper modelMapper;
 
-
     public List<Policy> getPoliciesByUsername(String username) {
         User user = userServiceInterface.getUserByUserName(username).get();
         List<Policy> policies = policyRepository.findAll().stream()
