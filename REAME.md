@@ -49,6 +49,36 @@ Challenge to apply Software Architecture position
 - All messages obtained from properties should have their language with Internationalization I18N.
 > End explication
 
+## Use Case
+**Normal Flow:**
+1. The client communicates with his insurance producer indicating what he had an accident by providing the policy number of guilty.
+2. The producer initiates the claim by entering the policy data of both and the proposed amount of compensation.
+    
+    3. If the policies are from the same insurer, it is automatically accepted and closed.
+        4. If the policies are from different insurers and the amount is less than or equal to the acceptance amount, the company automatically accepted and closed.
+        5. The System updates the negotiation record with the data.
+        6. The system modifies the status of the claim to CLOSED.
+        7. End of use case.
+    4. The System updates the negotiation record with the data.
+    5.  The system modifies the status of the claim to CLOSED.
+    6. End of use case.
+3. The System updates the trading record with the data received.
+4. The system initiates a claim in the OFFERED state.
+5. The producer of the guilty can reject or accept the offer of negotiation.
+
+**If PRODUCER ACCEPT THE OFFER:**
+6. The System updates the negotiation record with the data.
+7. The system modifies the status of the claim to CLOSED.
+8. End of use case.
+
+**If PRODUCER REJECT THE OFFER:**
+6. The System updates the negotiation record with the data.
+7. The system modifies the status of the claim to REJECTED.
+8. The victim's producer makes a new offer
+9. The process returns to point 3 of **NORMAL FLOW**
+
+
+
 ## Frameworks implemented on this solution
 
 1. SpringBoot
@@ -71,7 +101,6 @@ Services are exposed in [Swagger](http://localhost:8080/swagger-ui.html).
 The app Allow access to Database for Web Console. This configuration is in security class. If you need access to database, run the application go to this [Link](http://localhost:8080/h2-console). User is "sa" and passwors is "sa"
 
 ## Users
-
 
 There are nine users. three users for each of the companies. Each of them has a different profile, with the first on the list being the lowest, then the intermediate and finally the highest.
 
@@ -103,5 +132,5 @@ mvn clean install
 
 ```
 CD into folder app
-mvn spring-boot:run or java -jar assessment'version' ( 
+mvn spring-boot:run or java -jar assessment-1.0.0-SNAPSHOT.jar
 ```
