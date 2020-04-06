@@ -40,19 +40,16 @@ public class DefaultPolicyService implements PolicyServiceInterface {
     private Utility utility;
 
     @Autowired
-    private ModelMapper modelMapper;
-
-    @Autowired
     private ObjectMapper objectMapper;
 
     public DefaultPolicyService(PolicyRepository policyRepository, InsuranceRepository insuranceRepository,
-                                UserServiceInterface userServiceInterface, Utility utility,
-                                ModelMapper modelMapper, ObjectMapper objectMapper) {
+                                UserServiceInterface userServiceInterface, Utility utility
+                                , ObjectMapper objectMapper) {
         this.policyRepository = policyRepository;
         this.insuranceRepository = insuranceRepository;
         this.userServiceInterface = userServiceInterface;
         this.utility = utility;
-        this.modelMapper = modelMapper;
+
         this.objectMapper = objectMapper;
     }
 
@@ -95,6 +92,4 @@ public class DefaultPolicyService implements PolicyServiceInterface {
         policyRepository.save(policy);
         return policy;
     }
-
-
 }

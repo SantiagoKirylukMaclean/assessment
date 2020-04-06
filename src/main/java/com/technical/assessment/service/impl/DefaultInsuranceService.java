@@ -27,10 +27,14 @@ public class DefaultInsuranceService implements InsuranceServiceInterface {
     @Autowired
     private Utility utility;
 
-    public DefaultInsuranceService(InsuranceRepository insuranceRepository, UserServiceInterface userServiceInterface, Utility utility) {
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    public DefaultInsuranceService(InsuranceRepository insuranceRepository, UserServiceInterface userServiceInterface, Utility utility, ObjectMapper objectMapper) {
         this.insuranceRepository = insuranceRepository;
         this.userServiceInterface = userServiceInterface;
         this.utility = utility;
+        this.objectMapper = objectMapper;
     }
 
     public Insurance getInsuranceByUserName(String username) {
@@ -51,8 +55,7 @@ public class DefaultInsuranceService implements InsuranceServiceInterface {
             insurance = insuranceRepository.
                     findById(Long.parseLong(userOptional.get().getInsurance().getId().toString()))
                     .orElse(new Insurance());
-            ObjectMapper oMapper = new ObjectMapper();
-            insurance = oMapper.convertValue(utility.modifyField(updates, insurance), Insurance.class);
+            insurance = objectMapper.convertValue(utility.modifyField(updates, insurance), Insurance.class);
             insurance.setModifyDateTime(Calendar.getInstance());
             insuranceRepository.save(insurance);
         }

@@ -49,6 +49,5 @@ public class DefaultCompensationService implements CompensationServiceInterface 
             }
         }
         return compensations;
-
     }
 }

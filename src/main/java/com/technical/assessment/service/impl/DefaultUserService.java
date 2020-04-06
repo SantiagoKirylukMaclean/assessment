@@ -2,7 +2,6 @@ package com.technical.assessment.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.technical.assessment.model.Insurance;
-import com.technical.assessment.model.Policy;
 import com.technical.assessment.model.Role;
 import com.technical.assessment.model.User;
 import com.technical.assessment.repository.InsuranceRepository;
@@ -31,10 +30,10 @@ import java.util.stream.Collectors;
 public class DefaultUserService implements UserServiceInterface {
 
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
 
     @Autowired
-    ModelMapper modelMapper;
+    private ModelMapper modelMapper;
 
     @Autowired
     private InsuranceRepository insuranceRepository;
@@ -51,8 +50,11 @@ public class DefaultUserService implements UserServiceInterface {
     @Autowired
     private ObjectMapper objectMapper;
 
-    public DefaultUserService(InsuranceRepository insuranceRepository, RoleRepository roleRepository,
+    public DefaultUserService(UserRepository userRepository, ModelMapper modelMapper,
+                              InsuranceRepository insuranceRepository, RoleRepository roleRepository,
                               PasswordEncoder passwordEncoder, Utility utility, ObjectMapper objectMapper) {
+        this.userRepository = userRepository;
+        this.modelMapper = modelMapper;
         this.insuranceRepository = insuranceRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;

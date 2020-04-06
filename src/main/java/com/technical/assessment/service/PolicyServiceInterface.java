@@ -1,8 +1,6 @@
 package com.technical.assessment.service;
 
 import com.technical.assessment.model.Policy;
-import com.technical.assessment.model.dto.PolicyRequestDTO;
-import org.omg.PortableServer.POA;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

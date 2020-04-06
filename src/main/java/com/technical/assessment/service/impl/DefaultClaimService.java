@@ -82,8 +82,9 @@ public class DefaultClaimService implements ClaimServiceInterface {
     public List<Claim> getClaimsVictimByUserName(String username) {
         Optional<User> user = userRepository.findByUsername(username);
         return claimRepository.findAll().stream()
-                .filter(cg -> cg.getPolicyVictim().getInsurance().getId().equals(user.orElse(new User()).getInsurance().getId())).
-                        collect(Collectors.toList());
+                .filter(cg -> cg.getPolicyVictim().getInsurance().getId()
+                        .equals(user.orElse(new User()).getInsurance().getId()))
+                .collect(Collectors.toList());
     }
 
     public Claim addClaim(Claim claim, String username) {
@@ -122,14 +123,11 @@ public class DefaultClaimService implements ClaimServiceInterface {
         }
         claimRepository.save(claim);
         return claim;
-
-
     }
 
     public Claim rejectClaim(String claimId, Negotiation negotiation, String username) {
         Optional<User> userHeader = userRepository.findByUsername(username);
         Claim claim = claimRepository.findById(Long.parseLong(claimId)).orElse(new Claim());
-
 
         if (claim.getState() != 1) {
             log.debug(TextMessages.CLAIM_STATE_NOT_OFFERED);
@@ -144,7 +142,6 @@ public class DefaultClaimService implements ClaimServiceInterface {
         Double lasAmountProposal = getlastAmountProposal(claim);
         updateClaim(claim, 2);
         setNegotiation(claim, negotiation.getDescriptionMessage(), lasAmountProposal);
-
 
         claimRepository.save(claim);
         return claim;
@@ -195,7 +192,6 @@ public class DefaultClaimService implements ClaimServiceInterface {
         }
         updateClaim(claim, 1);
         setNegotiation(claim, negotiation.getDescriptionMessage(), negotiation.getAmount());
-
 
         claimRepository.save(claim);
         return claim;
