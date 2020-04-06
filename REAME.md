@@ -47,6 +47,7 @@ Challenge to apply Software Architecture position
 - Develop global and customized exception management from the service layer down and for ResponseEntity.
 - Extend automatic reach functionality by amount to apply to different insurance and policy types.
 - All messages obtained from properties should have their language with Internationalization I18N.
+- PUT methods
 > End explication
 
 ## Use Case
