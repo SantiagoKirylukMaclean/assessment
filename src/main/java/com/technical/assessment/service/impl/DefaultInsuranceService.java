@@ -30,7 +30,9 @@ public class DefaultInsuranceService implements InsuranceServiceInterface {
     @Autowired
     private ObjectMapper objectMapper;
 
-    public DefaultInsuranceService(InsuranceRepository insuranceRepository, UserServiceInterface userServiceInterface, Utility utility, ObjectMapper objectMapper) {
+    public DefaultInsuranceService(InsuranceRepository insuranceRepository,
+                                   UserServiceInterface userServiceInterface, Utility utility,
+                                   ObjectMapper objectMapper) {
         this.insuranceRepository = insuranceRepository;
         this.userServiceInterface = userServiceInterface;
         this.utility = utility;
