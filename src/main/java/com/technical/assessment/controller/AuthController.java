@@ -22,9 +22,8 @@ public class AuthController {
     }
 
     @PostMapping(value = "/auth/signin")
-    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginDTO loginRequest) {
+    public ResponseEntity<TokenDTO> authenticateUser(@Valid @RequestBody LoginDTO loginRequest) {
         String jwt = authServiceInterface.authUser(loginRequest);
-
         return ResponseEntity.ok(new TokenDTO(jwt, "Bearer"));
     }
 

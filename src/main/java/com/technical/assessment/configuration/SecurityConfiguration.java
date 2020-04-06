@@ -3,7 +3,6 @@ package com.technical.assessment.configuration;
 import com.technical.assessment.security.jwt.JwtAuthEntryPoint;
 import com.technical.assessment.security.jwt.JwtAuthTokenFilter;
 import com.technical.assessment.security.service.DefaultUserDetailsService;
-import com.technical.assessment.utils.UserRoles;
 import com.technical.assessment.utils.Utility;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +30,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private JwtAuthEntryPoint unauthorizedHandler;
+
+    public SecurityConfiguration(DefaultUserDetailsService userDetailsService, JwtAuthEntryPoint unauthorizedHandler) {
+        this.userDetailsService = userDetailsService;
+        this.unauthorizedHandler = unauthorizedHandler;
+    }
 
     @Override
     public void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
@@ -92,7 +96,5 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     public Utility utility() {
         return new Utility();
     }
-
-
 
 }

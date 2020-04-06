@@ -37,8 +37,10 @@ public class DefaultCompensationService implements CompensationServiceInterface 
                 .filter(claim -> claim.getPolicyVictim().getInsurance().getId().equals(headerUser.orElse(new User()).getInsurance().getId()))
                 .filter(claim -> claim.getState() == 3).collect(Collectors.toList());
         if (closedClimes.size() > 0) {
-            Compensation compensation = new Compensation();
+
             for (Claim claim : closedClimes) {
+                //TODO: Review asignation.
+                Compensation compensation = new Compensation();
                 compensation.setCompensationAmount(claim.getNegotiations().stream()
                         .max(Comparator.comparing(Negotiation::getId)).orElse(new Negotiation()).getAmount());
                 compensation.setModifyDateTime(claim.getModifyDateTime());

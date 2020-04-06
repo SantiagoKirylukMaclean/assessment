@@ -2,13 +2,16 @@ package com.technical.assessment.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.technical.assessment.model.Insurance;
+import com.technical.assessment.model.Policy;
 import com.technical.assessment.model.Role;
 import com.technical.assessment.model.User;
 import com.technical.assessment.repository.InsuranceRepository;
 import com.technical.assessment.repository.RoleRepository;
 import com.technical.assessment.repository.UserRepository;
 import com.technical.assessment.service.UserServiceInterface;
+import com.technical.assessment.utils.TextMessages;
 import com.technical.assessment.utils.Utility;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,6 +26,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class DefaultUserService implements UserServiceInterface {
 
@@ -44,15 +48,23 @@ public class DefaultUserService implements UserServiceInterface {
     @Autowired
     private Utility utility;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    public DefaultUserService(InsuranceRepository insuranceRepository, RoleRepository roleRepository,
+                              PasswordEncoder passwordEncoder, Utility utility, ObjectMapper objectMapper) {
+        this.insuranceRepository = insuranceRepository;
+        this.roleRepository = roleRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.utility = utility;
+        this.objectMapper = objectMapper;
+    }
+
     public List<User> getUsersByUserName(String username) {
         Optional<User> userHeader = this.getUserByUserName(username);
-        List<User> users = new ArrayList<>();
-        if (userHeader.isPresent()) {
-            users = userRepository.findAll().stream()
-                    .filter(u -> u.getInsurance().getId().equals(userHeader.get().getInsurance().getId())).
-                            collect(Collectors.toList());
-        }
-        return users;
+        return userRepository.findAll().stream()
+                .filter(u -> u.getInsurance().getId().equals(userHeader.orElse(new User()).getInsurance().getId())).
+                        collect(Collectors.toList());
     }
 
     public User getUserByUserNameAndId(String username, String id) {
@@ -64,23 +76,34 @@ public class DefaultUserService implements UserServiceInterface {
 
     public User addUser(User user, String username) {
         Optional<User> userHeader = this.getUserByUserName(username);
+        Optional<User> newUser = this.getUserByUserName(user.getUsername());
+        if (user.getUsername().equals(newUser.orElse(new User()).getUsername())) {
+            log.debug(TextMessages.USER_EXIST);
+            return new User();
+        }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setInsurance(insuranceRepository.findById(userHeader.orElse(new User()).getInsurance().getId()).orElse(new Insurance()));
         user.setActive(1);
         user.setModifyDateTime(Calendar.getInstance());
         List<Role> roles = new ArrayList<>();
-        for (Role role : user.getRoles()) {
-            roles.add(roleRepository.findByRoleName(role.getRoleName()));
-        }
+        roles.add(roleRepository.findByRoleName("ROLE_USER"));
         user.setRoles(new HashSet<Role>(roles));
         userRepository.save(user);
         return user;
     }
 
-    public User saveUser(Map<String, Object> updates, String id) {
+    public User saveUser(Map<String, Object> updates, String id, String username) {
+        Optional<User> userHeader = this.getUserByUserName(username);
         User user = userRepository.findById(Long.parseLong(id)).orElse(new User());
-        ObjectMapper oMapper = new ObjectMapper();
-        user = oMapper.convertValue(utility.modifyField(updates, user), User.class);
+        if (user.getId() == null){
+            log.debug(TextMessages.OBJECT_NOT_EXIST);
+            return new User();
+        }
+        if (!userHeader.orElse(new User()).getInsurance().getId().equals(user.getInsurance().getId())) {
+            log.debug(TextMessages.LOGGED_USER_NOT_INSURANCE);
+            return new User();
+        }
+        user = objectMapper.convertValue(utility.modifyField(updates, user), User.class);
         user.setModifyDateTime(Calendar.getInstance());
         userRepository.save(user);
         return user;

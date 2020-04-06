@@ -1,12 +1,5 @@
 --DROP TABLE IF EXISTS insurance;
 
---CREATE TABLE insurance (
---id LONG PRIMARY KEY AUTO_INCREMENT NOT NULL,
---name VARCHAR(256) NOT NULL,
---username VARCHAR(256) NOT NULL,
---password VARCHAR(256) NOT NULL
---);
-
 INSERT INTO `role` VALUES (1,'ROLE_USER');
 INSERT INTO `role` VALUES (2,'ROLE_PM');
 INSERT INTO `role` VALUES (3,'ROLE_SUP');
@@ -49,31 +42,54 @@ INSERT INTO policy (policy_description, covered_name, covered_last_name, covered
 INSERT INTO policy (policy_description, covered_name, covered_last_name, covered_email, insurance_id) VALUES ('Car','Claudio','Borghi','Borghi@gmail.com',1);
 INSERT INTO policy (policy_description, covered_name, covered_last_name, covered_email, insurance_id) VALUES ('House','Jose','Brown','Brown@gmail.com',1);
 INSERT INTO policy (policy_description, covered_name, covered_last_name, covered_email, insurance_id) VALUES ('Life','Daniel','Pasarella','Pasarella@gmail.com',1);
-INSERT INTO policy (policy_description, covered_name, covered_last_name, covered_email, insurance_id) VALUES ('Car','Jorge','Burruchaga','Burruchaga@gmail.com',1);
+--INSERT INTO policy (policy_description, covered_name, covered_last_name, covered_email, insurance_id) VALUES ('Car','Jorge','Burruchaga','Burruchaga@gmail.com',1);
 INSERT INTO policy (policy_description, covered_name, covered_last_name, covered_email, insurance_id) VALUES ('House','Nestor','Clausen','Clausen@gmail.com',2);
 INSERT INTO policy (policy_description, covered_name, covered_last_name, covered_email, insurance_id) VALUES ('Life','Jose','Cuciuffo','Cuciuffo@gmail.com',2);
 INSERT INTO policy (policy_description, covered_name, covered_last_name, covered_email, insurance_id) VALUES ('Car','Diego','Maradona','Maradona@gmail.com',2);
 INSERT INTO policy (policy_description, covered_name, covered_last_name, covered_email, insurance_id) VALUES ('House','Jorge','Valdano','Valdano@gmail.com',2);
 INSERT INTO policy (policy_description, covered_name, covered_last_name, covered_email, insurance_id) VALUES ('Life','Hector','Enrique','Enrique@gmail.com',2);
 INSERT INTO policy (policy_description, covered_name, covered_last_name, covered_email, insurance_id) VALUES ('Car','Oscar','Garre','Garre@gmail.com',2);
-INSERT INTO policy (policy_description, covered_name, covered_last_name, covered_email, insurance_id) VALUES ('House','Ricardo','Giusti','Giusti@gmail.com',2);
+--INSERT INTO policy (policy_description, covered_name, covered_last_name, covered_email, insurance_id) VALUES ('House','Ricardo','Giusti','Giusti@gmail.com',2);
 INSERT INTO policy (policy_description, covered_name, covered_last_name, covered_email, insurance_id) VALUES ('Life','Luis','Islas','Islas@gmail.com',3);
 INSERT INTO policy (policy_description, covered_name, covered_last_name, covered_email, insurance_id) VALUES ('Car','Julio','Olarticoechea','Olarticoechea@gmail.com',3);
 INSERT INTO policy (policy_description, covered_name, covered_last_name, covered_email, insurance_id) VALUES ('House','Pedro','Pasculli','Pasculli@gmail.com',3);
 INSERT INTO policy (policy_description, covered_name, covered_last_name, covered_email, insurance_id) VALUES ('Life','Nery','Pumpido','Pumpido@gmail.com',3);
 INSERT INTO policy (policy_description, covered_name, covered_last_name, covered_email, insurance_id) VALUES ('Car','OScar','Ruggeri','Ruggeri@gmail.com',3);
 INSERT INTO policy (policy_description, covered_name, covered_last_name, covered_email, insurance_id) VALUES ('House','Carlos','Tapia','Tapia@gmail.com',3);
-INSERT INTO policy (policy_description, covered_name, covered_last_name, covered_email, insurance_id) VALUES ('Life','Marcelo','Trobbiani','Trobbiani@gmail.com',3);
-INSERT INTO policy (policy_description, covered_name, covered_last_name, covered_email, insurance_id) VALUES ('Car','Hector','Zelada','Zelada@gmail.com',3);
+--INSERT INTO policy (policy_description, covered_name, covered_last_name, covered_email, insurance_id) VALUES ('Life','Marcelo','Trobbiani','Trobbiani@gmail.com',3);
+--INSERT INTO policy (policy_description, covered_name, covered_last_name, covered_email, insurance_id) VALUES ('Car','Hector','Zelada','Zelada@gmail.com',3);
 --
 
 --Insert claim
 INSERT INTO claim (state, guilty_policy_id, victim_policy_id, amount, MODIFY_DATE_TIME) VALUES (1,1,2,1600.05,'2020-04-02 08:00:00.000');
-INSERT INTO claim (state, guilty_policy_id, victim_policy_id, amount, MODIFY_DATE_TIME) VALUES (1,3,8,1600.05,'2020-04-02 08:00:00.000');
-INSERT INTO claim (state, guilty_policy_id, victim_policy_id, amount, MODIFY_DATE_TIME) VALUES (1,4,15,1600.05,'2020-04-02 08:00:00.000');
-INSERT INTO claim (state, guilty_policy_id, victim_policy_id, amount, MODIFY_DATE_TIME) VALUES (1,9,10,1600.05,'2020-04-02 08:00:00.000');
-INSERT INTO claim (state, guilty_policy_id, victim_policy_id, amount, MODIFY_DATE_TIME) VALUES (1,11,16,1600.05,'2020-04-02 08:00:00.000');
-INSERT INTO claim (state, guilty_policy_id, victim_policy_id, amount, MODIFY_DATE_TIME) VALUES (1,12,5,1600.05,'2020-04-02 08:00:00.000');
-INSERT INTO claim (state, guilty_policy_id, victim_policy_id, amount, MODIFY_DATE_TIME) VALUES (1,17,18,1600.05,'2020-04-02 08:00:00.000');
-INSERT INTO claim (state, guilty_policy_id, victim_policy_id, amount, MODIFY_DATE_TIME) VALUES (1,19,6,1600.05,'2020-04-02 08:00:00.000');
-INSERT INTO claim (state, guilty_policy_id, victim_policy_id, amount, MODIFY_DATE_TIME) VALUES (1,20,13,1600.05,'2020-04-02 08:00:00.000');
+INSERT INTO claim (state, guilty_policy_id, victim_policy_id, amount, MODIFY_DATE_TIME) VALUES (1,3,7,1600.05,'2020-04-02 08:00:00.000');
+INSERT INTO claim (state, guilty_policy_id, victim_policy_id, amount, MODIFY_DATE_TIME) VALUES (1,4,13,1600.05,'2020-04-02 08:00:00.000');
+INSERT INTO claim (state, guilty_policy_id, victim_policy_id, amount, MODIFY_DATE_TIME) VALUES (1,8,9,1600.05,'2020-04-02 08:00:00.000');
+INSERT INTO claim (state, guilty_policy_id, victim_policy_id, amount, MODIFY_DATE_TIME) VALUES (1,10,14,1600.05,'2020-04-02 08:00:00.000');
+INSERT INTO claim (state, guilty_policy_id, victim_policy_id, amount, MODIFY_DATE_TIME) VALUES (1,11,5,1600.05,'2020-04-02 08:00:00.000');
+INSERT INTO claim (state, guilty_policy_id, victim_policy_id, amount, MODIFY_DATE_TIME) VALUES (1,15,16,1600.05,'2020-04-02 08:00:00.000');
+INSERT INTO claim (state, guilty_policy_id, victim_policy_id, amount, MODIFY_DATE_TIME) VALUES (1,17,6,1600.05,'2020-04-02 08:00:00.000');
+INSERT INTO claim (state, guilty_policy_id, victim_policy_id, amount, MODIFY_DATE_TIME) VALUES (1,18,12,1600.05,'2020-04-02 08:00:00.000');
+
+--
+INSERT INTO NEGOTIATION (AMOUNT, DESCRIPTION_MESSAGE, MODIFY_DATE_TIME) VALUES (60001,'Claim is started by victim', '2020-04-06 00:51:43.554');
+INSERT INTO NEGOTIATION (AMOUNT, DESCRIPTION_MESSAGE, MODIFY_DATE_TIME) VALUES (60002,'Claim is started by victim', '2020-04-06 00:51:43.554');
+INSERT INTO NEGOTIATION (AMOUNT, DESCRIPTION_MESSAGE, MODIFY_DATE_TIME) VALUES (60003,'Claim is started by victim', '2020-04-06 00:51:43.554');
+INSERT INTO NEGOTIATION (AMOUNT, DESCRIPTION_MESSAGE, MODIFY_DATE_TIME) VALUES (60004,'Claim is started by victim', '2020-04-06 00:51:43.554');
+INSERT INTO NEGOTIATION (AMOUNT, DESCRIPTION_MESSAGE, MODIFY_DATE_TIME) VALUES (60005,'Claim is started by victim', '2020-04-06 00:51:43.554');
+INSERT INTO NEGOTIATION (AMOUNT, DESCRIPTION_MESSAGE, MODIFY_DATE_TIME) VALUES (60006,'Claim is started by victim', '2020-04-06 00:51:43.554');
+INSERT INTO NEGOTIATION (AMOUNT, DESCRIPTION_MESSAGE, MODIFY_DATE_TIME) VALUES (60007,'Claim is started by victim', '2020-04-06 00:51:43.554');
+INSERT INTO NEGOTIATION (AMOUNT, DESCRIPTION_MESSAGE, MODIFY_DATE_TIME) VALUES (60008,'Claim is started by victim', '2020-04-06 00:51:43.554');
+INSERT INTO NEGOTIATION (AMOUNT, DESCRIPTION_MESSAGE, MODIFY_DATE_TIME) VALUES (60009,'Claim is started by victim', '2020-04-06 00:51:43.554');
+
+--
+
+INSERT INTO CLAIM_NEGOTIATIONS (CLAIM_CLAIM_ID, NEGOTIATIONS_NEGOTIATION_ID ) VALUES (1,1);
+INSERT INTO CLAIM_NEGOTIATIONS (CLAIM_CLAIM_ID, NEGOTIATIONS_NEGOTIATION_ID ) VALUES (2,2);
+INSERT INTO CLAIM_NEGOTIATIONS (CLAIM_CLAIM_ID, NEGOTIATIONS_NEGOTIATION_ID ) VALUES (3,3);
+INSERT INTO CLAIM_NEGOTIATIONS (CLAIM_CLAIM_ID, NEGOTIATIONS_NEGOTIATION_ID ) VALUES (4,4);
+INSERT INTO CLAIM_NEGOTIATIONS (CLAIM_CLAIM_ID, NEGOTIATIONS_NEGOTIATION_ID ) VALUES (5,5);
+INSERT INTO CLAIM_NEGOTIATIONS (CLAIM_CLAIM_ID, NEGOTIATIONS_NEGOTIATION_ID ) VALUES (6,6);
+INSERT INTO CLAIM_NEGOTIATIONS (CLAIM_CLAIM_ID, NEGOTIATIONS_NEGOTIATION_ID ) VALUES (7,7);
+INSERT INTO CLAIM_NEGOTIATIONS (CLAIM_CLAIM_ID, NEGOTIATIONS_NEGOTIATION_ID ) VALUES (8,8);
+INSERT INTO CLAIM_NEGOTIATIONS (CLAIM_CLAIM_ID, NEGOTIATIONS_NEGOTIATION_ID ) VALUES (9,9);

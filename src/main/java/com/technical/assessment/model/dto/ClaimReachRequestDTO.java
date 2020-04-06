@@ -2,9 +2,11 @@ package com.technical.assessment.model.dto;
 
 import lombok.Data;
 
-@Data
-public class OfferRequestDTO {
+import javax.validation.constraints.Size;
 
+@Data
+public class ClaimReachRequestDTO {
+
+    @Size(min = 1, max = 128)
     private String descriptionMessage;
-    private Double amount;
 }

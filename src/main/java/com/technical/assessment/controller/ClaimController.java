@@ -1,22 +1,34 @@
 package com.technical.assessment.controller;
 
 import com.technical.assessment.model.Claim;
+import com.technical.assessment.model.Negotiation;
+import com.technical.assessment.model.Policy;
+import com.technical.assessment.model.dto.ClaimReachRequestDTO;
 import com.technical.assessment.model.dto.ClaimRequestDTO;
-import com.technical.assessment.model.dto.OfferRequestDTO;
+import com.technical.assessment.model.dto.ClaimResponseDTO;
+import com.technical.assessment.model.dto.ProposalRequestDTO;
 import com.technical.assessment.model.dto.RejectRequestDTO;
 import com.technical.assessment.service.ClaimServiceInterface;
+import com.technical.assessment.utils.UserRoles;
 import com.technical.assessment.utils.Utility;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 
-@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("${api.version}")
 public class ClaimController {
@@ -27,74 +39,110 @@ public class ClaimController {
     @Autowired
     private Utility utility;
 
-    @GetMapping("/insurances/claims")
-    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_PM') or hasRole('ROLE_SUP')")
-    public ResponseEntity<List<Claim>> getClaimsByUserName(HttpServletRequest headers) {
-        return claimServiceInterface.getClaimsByUserName(utility.getUserHeader(headers));
+    @Autowired
+    private ModelMapper modelMapper;
+
+    public ClaimController(ClaimServiceInterface claimServiceInterface, Utility utility, ModelMapper modelMapper) {
+        this.claimServiceInterface = claimServiceInterface;
+        this.utility = utility;
+        this.modelMapper = modelMapper;
     }
 
     @GetMapping("/insurances/claims/{id}")
-    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_PM') or hasRole('ROLE_SUP')")
-    public ResponseEntity<Claim> getClaimsById(HttpServletRequest headers, @PathVariable("id") String claimId) {
-        return claimServiceInterface.getClaimsById(utility.getUserHeader(headers), claimId);
+    @PreAuthorize(UserRoles.LOGGED_USER)
+    public ResponseEntity<ClaimResponseDTO> getClaimsById(HttpServletRequest headers, @PathVariable("id") String claimId) {
+        Claim claimResponse = claimServiceInterface.getClaimsById(utility.getUserHeader(headers), claimId);
+        if (claimResponse.getId() == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(modelMapper.map(claimResponse, ClaimResponseDTO.class));
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(modelMapper.map(claimResponse, ClaimResponseDTO.class));
     }
 
     @GetMapping("/insurances/claims/guilty")
-    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_PM') or hasRole('ROLE_SUP')")
-    public ResponseEntity<List<Claim>> getClaimsGultyByUserName(HttpServletRequest headers) {
-        return claimServiceInterface.getClaimsGultyByUserName(utility.getUserHeader(headers));
+    @PreAuthorize(UserRoles.LOGGED_USER)
+    public ResponseEntity<List<ClaimResponseDTO>> getClaimsGultyByUserName(HttpServletRequest headers) {
+        List<Claim> claimsResponse = claimServiceInterface.getClaimsGultyByUserName(utility.getUserHeader(headers));
+        List<ClaimResponseDTO> claimsResponseDTO = new ArrayList<>();
+        if (claimsResponse.size() == 0) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(claimsResponseDTO);
+        }
+        for (Claim claim : claimsResponse) {
+            claimsResponseDTO.add(modelMapper.map(claim, ClaimResponseDTO.class));
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(claimsResponseDTO);
     }
 
     @GetMapping("/insurances/claims/victim")
-    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_PM') or hasRole('ROLE_SUP')")
-    public ResponseEntity<List<Claim>> getClaimsVictimByUserName(HttpServletRequest headers) {
-        return claimServiceInterface.getClaimsVictimByUserName(utility.getUserHeader(headers));
+    @PreAuthorize(UserRoles.LOGGED_USER)
+    public ResponseEntity<List<ClaimResponseDTO>> getClaimsVictimByUserName(HttpServletRequest headers) {
+        List<Claim> claimsResponse = claimServiceInterface.getClaimsVictimByUserName(utility.getUserHeader(headers));
+        List<ClaimResponseDTO> claimsResponseDTO = new ArrayList<>();
+        if (claimsResponse.size() == 0) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(claimsResponseDTO);
+        }
+        for (Claim claim : claimsResponse) {
+            claimsResponseDTO.add(modelMapper.map(claim, ClaimResponseDTO.class));
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(claimsResponseDTO);
     }
 
     @PostMapping(value = "/insurances/claims", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_PM') or hasRole('ROLE_SUP')")
-    public ResponseEntity<?> addClaim(@RequestBody ClaimRequestDTO claim, HttpServletRequest headers) {
-        return claimServiceInterface.addClaim(claim, utility.getUserHeader(headers));
+    @PreAuthorize(UserRoles.LOGGED_USER)
+    public ResponseEntity<ClaimResponseDTO> addClaim(@Valid @RequestBody ClaimRequestDTO claimRequestDTO,
+                                                     HttpServletRequest headers) throws Exception {
+        Claim claimRequest = modelMapper.map(claimRequestDTO, Claim.class);
+
+        Policy policyVictim = new Policy();
+        policyVictim.setId(claimRequestDTO.getPolicyVictim());
+        claimRequest.setPolicyVictim(policyVictim);
+
+        Policy policyGuilty = new Policy();
+        policyGuilty.setId(claimRequestDTO.getPolicyGuilty());
+        claimRequest.setPolicyGuilty(policyGuilty);
+
+        Claim claimResponse = claimServiceInterface.addClaim(claimRequest, utility.getUserHeader(headers));
+        if (claimResponse.getId() == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(modelMapper.map(claimResponse, ClaimResponseDTO.class));
+        }
+        return ResponseEntity.status(HttpStatus.CREATED).body(modelMapper.map(claimResponse, ClaimResponseDTO.class));
     }
 
     @PostMapping(value = "/insurances/claims/reject/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_PM') or hasRole('ROLE_SUP')")
-    public ResponseEntity<?> rejectClaim(@Valid @RequestBody  RejectRequestDTO rejectRequestDTO, HttpServletRequest headers,
-                                         @PathVariable("id") String id) {
-        return claimServiceInterface.rejectClaim(id, rejectRequestDTO, utility.getUserHeader(headers));
+    @PreAuthorize(UserRoles.LOGGED_USER)
+    public ResponseEntity<ClaimResponseDTO> rejectClaim(@Valid @RequestBody RejectRequestDTO rejectRequestDTO,
+                                                        HttpServletRequest headers,
+                                                        @PathVariable("id") String id) {
+        Claim claimResponse = claimServiceInterface.rejectClaim(id, modelMapper.map(rejectRequestDTO, Negotiation.class),
+                utility.getUserHeader(headers));
+        if (claimResponse.getId() == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(modelMapper.map(claimResponse, ClaimResponseDTO.class));
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(modelMapper.map(claimResponse, ClaimResponseDTO.class));
     }
 
     @PostMapping(value = "/insurances/claims/proposal/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_PM') or hasRole('ROLE_SUP')")
-    public ResponseEntity<?> proposalClaim(@Valid @RequestBody OfferRequestDTO offerRequestDTO, HttpServletRequest headers,
-                                         @PathVariable("id") String id) {
-        return claimServiceInterface.proposalClaim(id, offerRequestDTO, utility.getUserHeader(headers));
+    @PreAuthorize(UserRoles.LOGGED_USER)
+    public ResponseEntity<ClaimResponseDTO> proposalClaim(@Valid @RequestBody ProposalRequestDTO proposalRequestDTO, HttpServletRequest headers,
+                                          @PathVariable("id") String id) {
+        Claim claimResponse = claimServiceInterface.proposalClaim(id, modelMapper.map(proposalRequestDTO, Negotiation.class),
+                utility.getUserHeader(headers));
+        if (claimResponse.getId() == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(modelMapper.map(claimResponse, ClaimResponseDTO.class));
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(modelMapper.map(claimResponse, ClaimResponseDTO.class));
     }
 
     @PostMapping(value = "/insurances/claims/reach/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_PM') or hasRole('ROLE_SUP')")
-    public ResponseEntity<?> reachClaim(@Valid @RequestBody RejectRequestDTO rejectRequestDTO, HttpServletRequest headers,
-                                         @PathVariable("id") String id) {
-        return claimServiceInterface.reachClaim(id, rejectRequestDTO, utility.getUserHeader(headers));
+    @PreAuthorize(UserRoles.LOGGED_PRODUCT_MANAGER)
+    public ResponseEntity<ClaimResponseDTO> reachClaim(@Valid @RequestBody ClaimReachRequestDTO claimReachRequestDTO,
+                                                       HttpServletRequest headers,
+                                                       @PathVariable("id") String id) {
+        Claim claimResponse = claimServiceInterface.reachClaim(id, modelMapper.map(claimReachRequestDTO, Negotiation.class),
+                utility.getUserHeader(headers));
+        if (claimResponse.getId() == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(modelMapper.map(claimResponse, ClaimResponseDTO.class));
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(modelMapper.map(claimResponse, ClaimResponseDTO.class));
     }
 
-    /*
-    @GetMapping("/insurances/user/{id}")
-    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_PM') or hasRole('ROLE_SUP')")
-    public ResponseEntity<User> getUser(HttpServletRequest headers,
-                                       @PathVariable("id") String id) throws Exception {
-        return userServiceInterface.getUserByUserName(utility.getUserHeader(headers), id);
-    }
-
-    @PostMapping(value = "/insurances/user", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasRole('ROLE_PM') or hasRole('ROLE_SUP')")
-    public ResponseEntity<?> addUser(@RequestBody UserRequestDTO user, HttpServletRequest headers) {
-        return userServiceInterface.addUser(user, utility.getUserHeader(headers));
-    }
-
-    @PatchMapping(value = "/insurances/user/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> saveUser(@RequestBody Map<String, Object> updates, @PathVariable("id") String id) {
-        return userServiceInterface.saveUser(updates, id);
-    }
-    */
 }

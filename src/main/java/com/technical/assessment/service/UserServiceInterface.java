@@ -14,5 +14,5 @@ public interface UserServiceInterface {
     Optional<User> getUserByUserName(String username);
     User getUserByUserNameAndId(String username, String id);
     User addUser(User user, String username);
-    User saveUser(Map<String, Object> updates, String id);
+    User saveUser(Map<String, Object> updates, String id, String username);
 }
