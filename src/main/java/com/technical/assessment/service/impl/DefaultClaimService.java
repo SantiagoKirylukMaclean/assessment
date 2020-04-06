@@ -4,45 +4,49 @@ import com.technical.assessment.model.Claim;
 import com.technical.assessment.model.Negotiation;
 import com.technical.assessment.model.Policy;
 import com.technical.assessment.model.User;
-import com.technical.assessment.model.dto.ClaimRequestDTO;
-import com.technical.assessment.model.dto.OfferRequestDTO;
-import com.technical.assessment.model.dto.RejectRequestDTO;
-import com.technical.assessment.repository.*;
+import com.technical.assessment.repository.ClaimRepository;
+import com.technical.assessment.repository.InsuranceRepository;
+import com.technical.assessment.repository.PolicyRepository;
+import com.technical.assessment.repository.RoleRepository;
+import com.technical.assessment.repository.UserRepository;
 import com.technical.assessment.service.ClaimServiceInterface;
+import com.technical.assessment.utils.TextMessages;
 import com.technical.assessment.utils.Utility;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Calendar;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @Slf4j
 public class DefaultClaimService implements ClaimServiceInterface {
 
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
 
     @Autowired
-    ClaimRepository claimRepository;
+    private ClaimRepository claimRepository;
 
     @Autowired
-    PolicyRepository policyRepository;
+    private PolicyRepository policyRepository;
 
     @Autowired
-    ModelMapper modelMapper;
+    private ModelMapper modelMapper;
 
     @Autowired
-    InsuranceRepository insuranceRepository;
+    private InsuranceRepository insuranceRepository;
 
     @Autowired
-    RoleRepository roleRepository;
+    private RoleRepository roleRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -50,193 +54,170 @@ public class DefaultClaimService implements ClaimServiceInterface {
     @Autowired
     private Utility utility;
 
-
-    public ResponseEntity<List<Claim>> getClaimsByUserName(String username) {
-        try {
-            Optional<User> user = userRepository.findByUsername(username);
-
-            List<Claim> claims1 = claimRepository.findAll().stream()
-                    .filter(cg -> cg.getPolicyGuilty().getInsurance().getId().equals(user.get().getInsurance().getId())).
-                            collect(Collectors.toList());
-            List<Claim> claims2 = claimRepository.findAll().stream()
-                    .filter(cg -> cg.getPolicyVictim().getInsurance().getId().equals(user.get().getInsurance().getId())).
-                            collect(Collectors.toList());
-
-            return ResponseEntity.status(HttpStatus.OK).
-                    body(Stream.concat(claims1.stream(), claims2.stream()).collect(Collectors.toList()));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
+    public DefaultClaimService(UserRepository userRepository, ClaimRepository claimRepository,
+                               PolicyRepository policyRepository, ModelMapper modelMapper,
+                               InsuranceRepository insuranceRepository, RoleRepository roleRepository,
+                               PasswordEncoder passwordEncoder, Utility utility) {
+        this.userRepository = userRepository;
+        this.claimRepository = claimRepository;
+        this.policyRepository = policyRepository;
+        this.modelMapper = modelMapper;
+        this.insuranceRepository = insuranceRepository;
+        this.roleRepository = roleRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.utility = utility;
     }
 
-    public ResponseEntity<Claim> getClaimsById(String headerUsername, String claimId) {
-        try {
-            Optional<User> headerUser = userRepository.findByUsername(headerUsername);
-            Claim claim = claimRepository.findById(Long.parseLong(claimId)).get();
-
-            return ResponseEntity.status(HttpStatus.OK).body(claim);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
+    public Claim getClaimsById(String headerUsername, String claimId) {
+        return claimRepository.findById(Long.parseLong(claimId)).orElse(new Claim());
     }
 
-    public ResponseEntity<List<Claim>> getClaimsGultyByUserName(String username) {
-        try {
-            Optional<User> user = userRepository.findByUsername(username);
-            List<Claim> claims = claimRepository.findAll().stream()
-                    .filter(cg -> cg.getPolicyGuilty().getInsurance().getId().equals(user.get().getInsurance().getId())).
-                            collect(Collectors.toList());
-            return ResponseEntity.status(HttpStatus.OK).
-                    body(claims);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
+    public List<Claim> getClaimsGultyByUserName(String username) {
+        Optional<User> user = userRepository.findByUsername(username);
+        return claimRepository.findAll().stream()
+                .filter(cg -> cg.getPolicyGuilty().getInsurance().getId()
+                        .equals(user.orElse(new User()).getInsurance().getId())).collect(Collectors.toList());
     }
 
-    public ResponseEntity<List<Claim>> getClaimsVictimByUserName(String username) {
-        try {
-            Optional<User> user = userRepository.findByUsername(username);
-            List<Claim> claims = claimRepository.findAll().stream()
-                    .filter(cg -> cg.getPolicyVictim().getInsurance().getId().equals(user.get().getInsurance().getId())).
-                            collect(Collectors.toList());
-            return ResponseEntity.status(HttpStatus.OK).
-                    body(claims);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
+    public List<Claim> getClaimsVictimByUserName(String username) {
+        Optional<User> user = userRepository.findByUsername(username);
+        return claimRepository.findAll().stream()
+                .filter(cg -> cg.getPolicyVictim().getInsurance().getId().equals(user.orElse(new User()).getInsurance().getId())).
+                        collect(Collectors.toList());
     }
 
-    public ResponseEntity<?> addClaim(ClaimRequestDTO claimRequestDTO, String username){
-
-        try {
-            User userHeader = userRepository.findByUsername(username).get();
-
-            List<Policy> policies = policyRepository.findAll();
-            Policy policyGuilty = policies.stream()
-                    .filter(policy -> claimRequestDTO.getPolicyGuilty().equals(policy.getId()))
-                    .findAny().orElse(null);
-            Policy policyVictim = policies.stream()
-                    .filter(policy -> claimRequestDTO.getPolicyVictim().equals(policy.getId()))
-                    .findAny().orElse(null);
-
-            if(userHeader.getInsurance().getId().equals(policyVictim.getInsurance().getId())){
-                Claim claim = modelMapper.map(claimRequestDTO, Claim.class);
-               if(policyGuilty.getInsurance().getId().equals(policyVictim.getInsurance().getId())){
-                   setClaim(policyGuilty, policyVictim, claim, 3);
-                   setNegotiation(claim, "Same victim and guilty insurance, close automatic", claim.getAmount());
-               }else if(Double.compare(claim.getAmount(),policyGuilty.getInsurance().getAutomaticAcceptAmount()) <= 0) {
-                   setClaim(policyGuilty, policyVictim, claim, 3);
-                   setNegotiation(claim, "Amount offered is less than automatic accept offer, close automatic", claim.getAmount());
-               }else{
-
-                   setClaim(policyGuilty, policyVictim, claim, 1);
-                   setNegotiation(claim, "Init claim", claim.getAmount());
-               }
-
-                claimRepository.save(claim);
-                return ResponseEntity.status(HttpStatus.OK).body("Claim saved ok");
-            }else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(HttpStatus.BAD_REQUEST.getReasonPhrase());
-            }
-        }catch (Exception e){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+    public Claim addClaim(Claim claim, String username) {
+        if (claim.getPolicyGuilty().getId().equals(claim.getPolicyVictim().getId())) {
+            log.debug(TextMessages.POLICIES_ARE_SAME);
+            return new Claim();
         }
+        User userHeader = userRepository.findByUsername(username).orElse(new User());
+        claim.setPolicyVictim(policyRepository.findById(claim.getPolicyVictim().getId()).orElse(new Policy()));
+        claim.setPolicyGuilty(policyRepository.findById(claim.getPolicyGuilty().getId()).orElse(new Policy()));
+
+        List<Policy> policies = policyRepository.findAll();
+        Policy policyGuilty = policies.stream()
+                .filter(policy -> claim.getPolicyGuilty().getId().equals(policy.getId()))
+                .findAny().orElse(null);
+        Policy policyVictim = policies.stream()
+                .filter(policy -> claim.getPolicyVictim().getId().equals(policy.getId()))
+                .findAny().orElse(null);
+
+        //Check if insurace of user is the same of policyVictim
+        if (!userHeader.getInsurance().getId().equals(policyVictim.getInsurance().getId())) {
+            log.debug(TextMessages.LOGGED_USER_NOT_INSURANCE);
+            return new Claim();
+        }
+
+        //Check is booth insuranse as same
+        if (policyGuilty.getInsurance().getId().equals(policyVictim.getInsurance().getId())) {
+            setClaim(policyGuilty, policyVictim, claim, 3);
+            setNegotiation(claim, TextMessages.SAME_VICTIM_AND_INSURANCE, claim.getAmount());
+        } else if (Double.compare(claim.getAmount(), policyGuilty.getInsurance().getAutomaticAcceptAmount()) <= 0) {
+            setClaim(policyGuilty, policyVictim, claim, 3);
+            setNegotiation(claim, TextMessages.PROPOSAL_LESS_AUTOMATIC, claim.getAmount());
+        } else {
+            setClaim(policyGuilty, policyVictim, claim, 1);
+            setNegotiation(claim, TextMessages.CLAIM_STARTED, claim.getAmount());
+        }
+        claimRepository.save(claim);
+        return claim;
+
+
     }
 
-    public ResponseEntity<?> rejectClaim(String claimId, RejectRequestDTO rejectRequestDTO, String username) {
-        try {
-            Optional<User> userHeader = userRepository.findByUsername(username);;
-            Optional<Claim> claim = claimRepository.findById(Long.parseLong(claimId));
-            Double lasAmountProposal = getlastAmountProposal(claim.get());
-            //Check if state is offered
-            if(claim.get().getState() == 1) {
-                if (userHeader.get().getInsurance().getId().equals(claim.get().getPolicyGuilty().getInsurance().getId())) {
-                    updateClaim(claim.get(), 2);
-                    setNegotiation(claim.get(), rejectRequestDTO.getDescriptionMessage(), lasAmountProposal);
-                } else {
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(HttpStatus.BAD_REQUEST.getReasonPhrase());
-                }
-            }else{ ;
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El estado de el reclamo tiene que ser ofertado para poder rechazar");
-            }
+    public Claim rejectClaim(String claimId, Negotiation negotiation, String username) {
+        Optional<User> userHeader = userRepository.findByUsername(username);
+        Claim claim = claimRepository.findById(Long.parseLong(claimId)).orElse(new Claim());
 
-            claimRepository.save(claim.get());
-            return ResponseEntity.status(HttpStatus.OK).body("Claim saved ok");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+
+        if (claim.getState() != 1) {
+            log.debug(TextMessages.CLAIM_STATE_NOT_OFFERED);
+            return new Claim();
         }
+
+        //Check if insurace of user is the same od policyGuilty
+        if (!userHeader.orElse(new User()).getInsurance().getId().equals(claim.getPolicyGuilty().getInsurance().getId())) {
+            log.debug(TextMessages.LOGGED_USER_NOT_INSURANCE);
+            return new Claim();
+        }
+        Double lasAmountProposal = getlastAmountProposal(claim);
+        updateClaim(claim, 2);
+        setNegotiation(claim, negotiation.getDescriptionMessage(), lasAmountProposal);
+
+
+        claimRepository.save(claim);
+        return claim;
     }
 
-    public ResponseEntity<?> reachClaim(String claimId, RejectRequestDTO rejectRequestDTO, String username) {
-        try {
-            Optional<User> userHeader = userRepository.findByUsername(username);;
-            Optional<Claim> claim = claimRepository.findById(Long.parseLong(claimId));
-            Double lastAmountProposal = getlastAmountProposal(claim.get());
-            //Check if state is offered
-            if(claim.get().getState() == 1) {
-                if (userHeader.get().getInsurance().getId().equals(claim.get().getPolicyGuilty().getInsurance().getId())) {
-                    updateClaim(claim.get(), 3);
-                    setNegotiation(claim.get(), rejectRequestDTO.getDescriptionMessage(), lastAmountProposal);
-                } else {
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(HttpStatus.BAD_REQUEST.getReasonPhrase());
-                }
-            }else{
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El estado de el reclamo tiene que ser ofertado para poder rechazar");
-            }
+    public Claim reachClaim(String claimId, Negotiation negotiation, String username) {
+        Optional<User> userHeader = userRepository.findByUsername(username);
+        Claim claim = claimRepository.findById(Long.parseLong(claimId)).orElse(new Claim());
 
-            claimRepository.save(claim.get());
-            return ResponseEntity.status(HttpStatus.OK).body("Claim saved ok");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        //Check if state is offered
+        if (claim.getState() != 1) {
+            log.debug(TextMessages.CLAIM_STATE_NOT_OFFERED);
+            return new Claim();
         }
+
+        //Check if insurace of user is the same od policyGuilty
+        if (!userHeader.get().getInsurance().getId().equals(claim.getPolicyGuilty().getInsurance().getId())) {
+            log.debug(TextMessages.LOGGED_USER_NOT_INSURANCE);
+            return new Claim();
+        }
+        Double lastAmountProposal = getlastAmountProposal(claim);
+        updateClaim(claim, 3);
+        setNegotiation(claim, negotiation.getDescriptionMessage(), lastAmountProposal);
+
+        claimRepository.save(claim);
+        return claim;
     }
 
-    public ResponseEntity<?> proposalClaim(String claimId, OfferRequestDTO offerRequestDTO, String username) {
-        try {
-            Optional<User> userHeader = userRepository.findByUsername(username);;
-            Optional<Claim> claim = claimRepository.findById(Long.parseLong(claimId));
-            Double lasAmountProposal = getlastAmountProposal(claim.get());
-            //Check if state is ejected
-            if(claim.get().getState() == 2){
-            //Check is loggerd user have same insurace than policy victim
-                if (userHeader.get().getInsurance().getId().equals(claim.get().getPolicyVictim().getInsurance().getId())){
-                    //Check is proposal amount is beyond las proposal amount
-                    if(Double.compare(offerRequestDTO.getAmount(), lasAmountProposal) < 0 ){
-                        updateClaim(claim.get(),1);
-                        setNegotiation(claim.get(), offerRequestDTO.getDescriptionMessage(), offerRequestDTO.getAmount());
-                    }else{
-                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Monto ofrecido menos");
-                    }
-                } else {
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(HttpStatus.BAD_REQUEST.getReasonPhrase());
-                }
-            }else{
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El estado de el reclamo tiene que ser rechazado para poder ofertar");
-            }
-            claimRepository.save(claim.get());
-            return ResponseEntity.status(HttpStatus.OK).body("Claim saved ok");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+    public Claim proposalClaim(String claimId, Negotiation negotiation, String username) {
+        Optional<User> userHeader = userRepository.findByUsername(username);
+        Claim claim = claimRepository.findById(Long.parseLong(claimId)).orElse(new Claim());
+
+        //Check if state is offered
+        if (claim.getState() != 2) {
+            log.debug(TextMessages.CLAIM_STATE_NOT_OFFERED);
+            return new Claim();
         }
+        //Check is loggerd user have same insurace than policy victim
+        if (!userHeader.get().getInsurance().getId().equals(claim.getPolicyVictim().getInsurance().getId())) {
+            log.debug(TextMessages.LOGGED_USER_NOT_INSURANCE);
+            return new Claim();
+        }
+        Double lasAmountProposal = getlastAmountProposal(claim);
+        //Check is proposal amount is beyond las proposal amount
+        if (Double.compare(negotiation.getAmount(), lasAmountProposal) >= 0) {
+            log.debug(TextMessages.PROPOSAL_AMOUNT_LOWER);
+            return new Claim();
+        }
+        updateClaim(claim, 1);
+        setNegotiation(claim, negotiation.getDescriptionMessage(), negotiation.getAmount());
+
+
+        claimRepository.save(claim);
+        return claim;
     }
 
     private Double getlastAmountProposal(Claim claim) {
-        return claim.getNegotiations().stream().max(Comparator.comparing(Negotiation::getId)).get().getAmount();
+        return claim.getNegotiations().stream().max(Comparator.comparing(Negotiation::getId)).orElse(new Negotiation()).getAmount();
     }
 
-    private void setClaim(Policy policyGuilty, Policy policyVictim, Claim claim, int status){
+    private void setClaim(Policy policyGuilty, Policy policyVictim, Claim claim, int status) {
         claim.setPolicyGuilty(policyGuilty);
         claim.setPolicyVictim(policyVictim);
         claim.setState(status);
         claim.setModifyDateTime(Calendar.getInstance());
     }
 
-    private void updateClaim(Claim claim, int status){
+    private void updateClaim(Claim claim, int status) {
         claim.setState(status);
         claim.setModifyDateTime(Calendar.getInstance());
     }
 
-    private void setNegotiation(Claim claim, String descritionMessage, Double negotiationAmount){
+    private void setNegotiation(Claim claim, String descritionMessage, Double negotiationAmount) {
         Set<Negotiation> negotiations = new HashSet<>();
         if (claim.getNegotiations() != null) {
             negotiations.addAll(claim.getNegotiations());
