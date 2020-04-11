@@ -12,13 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -63,41 +57,57 @@ public class PoliciyController {
 
     @GetMapping("/insurances/policies/{id}")
     @PreAuthorize(UserRoles.LOGGED_USER)
-    public ResponseEntity<PolicyResponseDTO> getPolicy(HttpServletRequest headers, @PathVariable("id") String id){
+    public ResponseEntity<PolicyResponseDTO> getPolicy(HttpServletRequest headers, @PathVariable("id") String id) {
         Policy policyResponse = policyServiceInterface.getPolicyByUsername(utility.getUserHeader(headers), id);
-        if (policyResponse.getId() == null){
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(modelMapper.map(policyResponse,PolicyResponseDTO.class));
+        if (policyResponse.getId() == null) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(modelMapper.map(policyResponse, PolicyResponseDTO.class));
         }
-        return ResponseEntity.status(HttpStatus.OK).body(modelMapper.map(policyResponse,PolicyResponseDTO.class));
+        return ResponseEntity.status(HttpStatus.OK).body(modelMapper.map(policyResponse, PolicyResponseDTO.class));
     }
 
     @PostMapping(value = "/insurances/policy", consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize(UserRoles.LOGGED_USER)
     public ResponseEntity<PolicyResponseDTO> addPolicy(@Valid @RequestBody PolicyRequestDTO policyRequestDTO,
-                                       HttpServletRequest headers) {
+                                                       HttpServletRequest headers) {
         Policy policyRequest = modelMapper.map(policyRequestDTO, Policy.class);
         Policy policyResponse = policyServiceInterface.savePolicy(policyRequest, utility.getUserHeader(headers));
-        if (policyResponse.getId() == null){
+        if (policyResponse.getId() == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(modelMapper.map(policyResponse,PolicyResponseDTO.class));
+                    .body(modelMapper.map(policyResponse, PolicyResponseDTO.class));
         }
         return ResponseEntity.status(HttpStatus.OK)
-                .body(modelMapper.map(policyResponse,PolicyResponseDTO.class));
+                .body(modelMapper.map(policyResponse, PolicyResponseDTO.class));
     }
 
     @PatchMapping(value = "/insurances/policy/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize(UserRoles.LOGGED_PRODUCT_MANAGER)
-    public ResponseEntity<PolicyResponseDTO> savePolicie(@RequestBody Map<String, Object> updates,
-                                         HttpServletRequest headers,
-                                         @PathVariable("id") String id) {
+    public ResponseEntity<PolicyResponseDTO> savePolicy(@RequestBody Map<String, Object> updates,
+                                                        HttpServletRequest headers,
+                                                        @PathVariable("id") String id) {
         Policy policyResponse = policyServiceInterface.savePolicy(updates, utility.getUserHeader(headers), id);
-        if (policyResponse.getId() == null){
+        if (policyResponse.getId() == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(modelMapper.map(policyResponse,PolicyResponseDTO.class));
+                    .body(modelMapper.map(policyResponse, PolicyResponseDTO.class));
         }
 
         return ResponseEntity.status(HttpStatus.OK)
-                .body(modelMapper.map(policyResponse,PolicyResponseDTO.class));
+                .body(modelMapper.map(policyResponse, PolicyResponseDTO.class));
+    }
+
+    @PutMapping(value = "/insurances/policy/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize(UserRoles.LOGGED_USER)
+    public ResponseEntity<PolicyResponseDTO> modifyPolicy(@Valid @RequestBody PolicyRequestDTO policyRequestDTO,
+                                                          HttpServletRequest headers,
+                                                          @PathVariable("id") String id) {
+        Policy policyResponse = policyServiceInterface.savePolicy(modelMapper.map(policyRequestDTO, Policy.class),
+                utility.getUserHeader(headers),
+                id);
+        if (policyResponse.getId() == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(modelMapper.map(policyResponse, PolicyResponseDTO.class));
+        }
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(modelMapper.map(policyResponse, PolicyResponseDTO.class));
     }
 
 

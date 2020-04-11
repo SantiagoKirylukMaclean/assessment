@@ -16,13 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -92,6 +86,25 @@ public class DefaultUserService implements UserServiceInterface {
         user.setRoles(new HashSet<Role>(roles));
         userRepository.save(user);
         return user;
+    }
+
+    public User alterUser(User userUpdate, String username, String userId, Set<String> rolesUpdate) {
+
+        if (userUpdate.getUsername()
+                .equals(this.getUserByUserName(userUpdate.getUsername()).orElse(new User()).getUsername())) {
+            log.debug(TextMessages.USER_EXIST);
+            return new User();
+        }
+        userUpdate.setId(Long.parseLong(userId));
+        userUpdate.setInsurance(insuranceRepository.findById(this.getUserByUserName(username).orElse(new User()).getInsurance().getId()).orElse(new Insurance()));
+        userUpdate.setActive(1);
+        userUpdate.setModifyDateTime(Calendar.getInstance());
+        List<Role> roles = new ArrayList<>();
+        for(String role : rolesUpdate){
+            roles.add(roleRepository.findByRoleName(role));
+        }
+        userUpdate.setRoles(new HashSet<Role>(roles));
+        return userRepository.save(userUpdate);
     }
 
     public User saveUser(Map<String, Object> updates, String id, String username) {

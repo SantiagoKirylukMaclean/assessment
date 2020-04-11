@@ -76,9 +76,9 @@ public class DefaultPolicyService implements PolicyServiceInterface {
         return policy;
     }
 
-    public Policy savePolicy(Map<String, Object> updates, String username, String policieId) {
+    public Policy savePolicy(Map<String, Object> updates, String username, String policyId) {
         Optional<User> userHeader = userServiceInterface.getUserByUserName(username);
-        Policy policy = policyRepository.findById(Long.parseLong(policieId)).orElse(new Policy());
+        Policy policy = policyRepository.findById(Long.parseLong(policyId)).orElse(new Policy());
         if (policy.getId() == null){
             log.debug(TextMessages.OBJECT_NOT_EXIST);
             return new Policy();
@@ -91,5 +91,22 @@ public class DefaultPolicyService implements PolicyServiceInterface {
         policy.setModifyDateTime(Calendar.getInstance());
         policyRepository.save(policy);
         return policy;
+    }
+
+    public Policy savePolicy(Policy policyUpdate, String username, String policyId) {
+        Optional<User> userHeader = userServiceInterface.getUserByUserName(username);
+        Policy policy = policyRepository.findById(Long.parseLong(policyId)).orElse(new Policy());
+        if (policy.getId() == null){
+            log.debug(TextMessages.OBJECT_NOT_EXIST);
+            return new Policy();
+        }
+        if (!userHeader.get().getInsurance().getId().equals(policy.getInsurance().getId())) {
+            log.debug(TextMessages.LOGGED_USER_NOT_INSURANCE);
+            return new Policy();
+        }
+        policyUpdate.setId(policy.getId());
+        policyUpdate.setModifyDateTime(Calendar.getInstance());
+        policyUpdate.setInsurance(userHeader.orElse(new User()).getInsurance());
+        return policyRepository.save(policyUpdate);
     }
 }

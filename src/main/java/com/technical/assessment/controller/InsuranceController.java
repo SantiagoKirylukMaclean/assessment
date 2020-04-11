@@ -51,7 +51,7 @@ public class InsuranceController {
 
     @GetMapping("/insurances")
     @PreAuthorize(UserRoles.LOGGED_USER)
-    public ResponseEntity<InsuranceResponseDTO> getAllInsurance(HttpServletRequest headers) {
+    public ResponseEntity<InsuranceResponseDTO> obtainAllInsurances(HttpServletRequest headers) {
         Insurance insuranceResponse = insuranceServiceInterface.getInsuranceByUserName(utility.getUserHeader(headers));
         if (insuranceResponse.getId() == null){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -63,7 +63,7 @@ public class InsuranceController {
 
     @PatchMapping(value = "/insurances", consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize(UserRoles.LOGGED_SUPERVISOR)
-    public ResponseEntity<InsuranceResponseDTO> insuranceResponseDTO(@RequestBody Map<String, Object> updates, HttpServletRequest headers) {
+    public ResponseEntity<InsuranceResponseDTO> modifyInsurance(@RequestBody Map<String, Object> updates, HttpServletRequest headers) {
         Insurance insuranceResponse =  insuranceServiceInterface.updateFieldsInsurance(updates, utility.getUserHeader(headers));
         if (insuranceResponse.getId() == null){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -75,8 +75,8 @@ public class InsuranceController {
 
     @PutMapping(value = "/insurances", consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize(UserRoles.LOGGED_SUPERVISOR)
-    public ResponseEntity<Insurance> updateInsurance(@Valid @RequestBody InsuranceRequestDTO insuranceRequestDTO,
-                                                        HttpServletRequest headers) {
+    public ResponseEntity<Insurance> modifyInsurance(@Valid @RequestBody InsuranceRequestDTO insuranceRequestDTO,
+                                                     HttpServletRequest headers) {
         Insurance insuranceResponse = insuranceServiceInterface.updateInsurance(modelMapper.map(insuranceRequestDTO, Insurance.class),
                 utility.getUserHeader(headers));
         if (insuranceResponse.getId() == null) {
