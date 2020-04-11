@@ -2,11 +2,15 @@ package com.technical.assessment.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.technical.assessment.model.Insurance;
+import com.technical.assessment.model.Policy;
 import com.technical.assessment.model.User;
+import com.technical.assessment.model.dto.InsuranceRequestDTO;
 import com.technical.assessment.repository.InsuranceRepository;
 import com.technical.assessment.service.InsuranceServiceInterface;
 import com.technical.assessment.service.UserServiceInterface;
+import com.technical.assessment.utils.TextMessages;
 import com.technical.assessment.utils.Utility;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +18,7 @@ import java.util.Calendar;
 import java.util.Map;
 import java.util.Optional;
 
-
+@Slf4j
 @Service
 public class DefaultInsuranceService implements InsuranceServiceInterface {
 
@@ -50,7 +54,7 @@ public class DefaultInsuranceService implements InsuranceServiceInterface {
         return insurance;
     }
 
-    public Insurance saveInsurance(Map<String, Object> updates, String username) {
+    public Insurance updateFieldsInsurance(Map<String, Object> updates, String username) {
         Optional<User> userOptional = userServiceInterface.getUserByUserName(username);
         Insurance insurance = new Insurance();
         if(userOptional.isPresent()) {
@@ -62,5 +66,22 @@ public class DefaultInsuranceService implements InsuranceServiceInterface {
             insuranceRepository.save(insurance);
         }
         return insurance;
+    }
+
+    public Insurance updateInsurance(Insurance insuranceUpdate, String username) {
+        Optional<User> userHeader = userServiceInterface.getUserByUserName(username);
+        Insurance insurance = insuranceRepository.findById(userHeader.orElse(new User()).getInsurance().getId())
+                .orElse(new Insurance());
+        if (insurance.getId() == null){
+            log.debug(TextMessages.OBJECT_NOT_EXIST);
+            return new Insurance();
+        }
+        if (!userHeader.get().getInsurance().getId().equals(insurance.getId())) {
+            log.debug(TextMessages.LOGGED_USER_NOT_INSURANCE);
+            return new Insurance();
+        }
+        insuranceUpdate.setId(insurance.getId());
+        insuranceUpdate.setModifyDateTime(Calendar.getInstance());
+        return insuranceRepository.save(insuranceUpdate);
     }
 }

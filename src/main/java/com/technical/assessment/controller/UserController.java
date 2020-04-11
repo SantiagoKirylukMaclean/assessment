@@ -1,5 +1,6 @@
 package com.technical.assessment.controller;
 
+import com.technical.assessment.model.Role;
 import com.technical.assessment.model.User;
 import com.technical.assessment.model.dto.UserRequestDTO;
 import com.technical.assessment.model.dto.UserResponseDTO;
@@ -12,18 +13,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -64,9 +60,9 @@ public class UserController {
     @GetMapping("/insurances/user/{id}")
     @PreAuthorize(UserRoles.LOGGED_USER)
     public ResponseEntity<UserResponseDTO> getUser(HttpServletRequest headers,
-                                       @PathVariable("id") String id) {
+                                                   @PathVariable("id") String id) {
         User userResponse = userServiceInterface.getUserByUserNameAndId(utility.getUserHeader(headers), id);
-        if(userResponse.getId() == null ){
+        if (userResponse.getId() == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(modelMapper.map(userResponse, UserResponseDTO.class));
         }
         return ResponseEntity.status(HttpStatus.OK).body(modelMapper.map(userResponse, UserResponseDTO.class));
@@ -77,8 +73,8 @@ public class UserController {
     public ResponseEntity<UserResponseDTO> addUser(@Valid @RequestBody UserRequestDTO userRequestDTO,
                                                    HttpServletRequest headers) {
         User userResponse = userServiceInterface
-                .addUser(modelMapper.map(userRequestDTO, User.class), utility.getUserHeader(headers));
-        if(userResponse.getId() == null ){
+                .addUser(modelMapper.map(userRequestDTO, User.class), utility.getUserHeader(headers), userRequestDTO.getRoles());
+        if (userResponse.getId() == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(modelMapper.map(userResponse, UserResponseDTO.class));
         }
         return ResponseEntity.status(HttpStatus.OK).body(modelMapper.map(userResponse, UserResponseDTO.class));
@@ -90,7 +86,22 @@ public class UserController {
                                                     @PathVariable("id") String id,
                                                     HttpServletRequest headers) {
         User userResponse = userServiceInterface.saveUser(updates, id, utility.getUserHeader(headers));
-        if(userResponse.getId() == null ){
+        if (userResponse.getId() == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(modelMapper.map(userResponse, UserResponseDTO.class));
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(modelMapper.map(userResponse, UserResponseDTO.class));
+    }
+
+    @PutMapping(value = "/insurances/user/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize(UserRoles.LOGGED_PRODUCT_MANAGER)
+    public ResponseEntity<UserResponseDTO> modifyUser(@Valid @RequestBody UserRequestDTO userRequestDTO,
+                                                      HttpServletRequest headers,
+                                                      @PathVariable("id") String id) {
+
+        User userResponse = userServiceInterface
+                .alterUser(modelMapper.map(userRequestDTO, User.class), utility.getUserHeader(headers), id,
+                        userRequestDTO.getRoles());
+        if (userResponse.getId() == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(modelMapper.map(userResponse, UserResponseDTO.class));
         }
         return ResponseEntity.status(HttpStatus.OK).body(modelMapper.map(userResponse, UserResponseDTO.class));

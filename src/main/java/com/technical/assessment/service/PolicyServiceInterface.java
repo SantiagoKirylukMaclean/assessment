@@ -12,5 +12,6 @@ public interface PolicyServiceInterface {
     List<Policy> getPoliciesByUsername(String username);
     Policy getPolicyByUsername(String username, String id);
     Policy savePolicy(Policy policy, String username);
-    Policy savePolicy(Map<String, Object> updates, String username, String policieId);
+    Policy savePolicy(Map<String, Object> updates, String username, String policyId);
+    Policy savePolicy(Policy policyUpdate, String username, String policyId);
 }

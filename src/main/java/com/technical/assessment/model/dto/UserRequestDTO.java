@@ -1,7 +1,10 @@
 package com.technical.assessment.model.dto;
 
 
+import com.technical.assessment.model.Role;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Size;
