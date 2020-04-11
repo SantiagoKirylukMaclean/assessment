@@ -73,7 +73,7 @@ public class UserController {
     public ResponseEntity<UserResponseDTO> addUser(@Valid @RequestBody UserRequestDTO userRequestDTO,
                                                    HttpServletRequest headers) {
         User userResponse = userServiceInterface
-                .addUser(modelMapper.map(userRequestDTO, User.class), utility.getUserHeader(headers));
+                .addUser(modelMapper.map(userRequestDTO, User.class), utility.getUserHeader(headers), userRequestDTO.getRoles());
         if (userResponse.getId() == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(modelMapper.map(userResponse, UserResponseDTO.class));
         }

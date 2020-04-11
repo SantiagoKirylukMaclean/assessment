@@ -70,7 +70,7 @@ public class DefaultUserService implements UserServiceInterface {
                 .filter(p -> p.getId().equals(Long.parseLong(id))).findFirst().orElse(new User());
     }
 
-    public User addUser(User user, String username) {
+    public User addUser(User user, String username, Set<String> rolesUpdate) {
         Optional<User> userHeader = this.getUserByUserName(username);
         Optional<User> newUser = this.getUserByUserName(user.getUsername());
         if (user.getUsername().equals(newUser.orElse(new User()).getUsername())) {
@@ -81,9 +81,7 @@ public class DefaultUserService implements UserServiceInterface {
         user.setInsurance(insuranceRepository.findById(userHeader.orElse(new User()).getInsurance().getId()).orElse(new Insurance()));
         user.setActive(1);
         user.setModifyDateTime(Calendar.getInstance());
-        List<Role> roles = new ArrayList<>();
-        roles.add(roleRepository.findByRoleName("ROLE_USER"));
-        user.setRoles(new HashSet<Role>(roles));
+        user.setRoles(new HashSet<Role>(getRolesFromArray(rolesUpdate)));
         userRepository.save(user);
         return user;
     }
@@ -99,11 +97,7 @@ public class DefaultUserService implements UserServiceInterface {
         userUpdate.setInsurance(insuranceRepository.findById(this.getUserByUserName(username).orElse(new User()).getInsurance().getId()).orElse(new Insurance()));
         userUpdate.setActive(1);
         userUpdate.setModifyDateTime(Calendar.getInstance());
-        List<Role> roles = new ArrayList<>();
-        for(String role : rolesUpdate){
-            roles.add(roleRepository.findByRoleName(role));
-        }
-        userUpdate.setRoles(new HashSet<Role>(roles));
+        userUpdate.setRoles(new HashSet<Role>(getRolesFromArray(rolesUpdate)));
         return userRepository.save(userUpdate);
     }
 
@@ -126,6 +120,14 @@ public class DefaultUserService implements UserServiceInterface {
 
     public Optional<User> getUserByUserName(String username) {
         return userRepository.findByUsername(username);
+    }
+
+    private List<Role> getRolesFromArray(Set<String> rolesUpdate ){
+        List<Role> roles = new ArrayList<>();
+        for(String role : rolesUpdate){
+            roles.add(roleRepository.findByRoleName(role));
+        }
+        return roles;
     }
 
 }
