@@ -105,7 +105,7 @@ public class DefaultUserService implements UserServiceInterface {
         Optional<User> userHeader = this.getUserByUserName(username);
         User user = userRepository.findById(Long.parseLong(id)).orElse(new User());
         if (user.getId() == null){
-            log.debug(TextMessages.OBJECT_NOT_EXIST);
+            log.debug(TextMessages.REQUEST_DATA_NOT_AVAILABLE);
             return new User();
         }
         if (!userHeader.orElse(new User()).getInsurance().getId().equals(user.getInsurance().getId())) {

@@ -2,9 +2,7 @@ package com.technical.assessment.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.technical.assessment.model.Insurance;
-import com.technical.assessment.model.Policy;
 import com.technical.assessment.model.User;
-import com.technical.assessment.model.dto.InsuranceRequestDTO;
 import com.technical.assessment.repository.InsuranceRepository;
 import com.technical.assessment.service.InsuranceServiceInterface;
 import com.technical.assessment.service.UserServiceInterface;
@@ -73,7 +71,7 @@ public class DefaultInsuranceService implements InsuranceServiceInterface {
         Insurance insurance = insuranceRepository.findById(userHeader.orElse(new User()).getInsurance().getId())
                 .orElse(new Insurance());
         if (insurance.getId() == null){
-            log.debug(TextMessages.OBJECT_NOT_EXIST);
+            log.debug(TextMessages.REQUEST_DATA_NOT_AVAILABLE);
             return new Insurance();
         }
         if (!userHeader.get().getInsurance().getId().equals(insurance.getId())) {

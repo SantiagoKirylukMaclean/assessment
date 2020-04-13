@@ -10,7 +10,7 @@ import java.util.List;
 public interface ClaimServiceInterface {
 
     Claim getClaimsById(String headerUsername, String claimId);
-    List<Claim> getClaimsGultyByUserName(String username);
+    List<Claim> getClaimsGuiltyByUserName(String username);
     List<Claim> getClaimsVictimByUserName(String username);
     Claim addClaim(Claim claim, String username);
     Claim rejectClaim(String claimId, Negotiation negotiation, String username);

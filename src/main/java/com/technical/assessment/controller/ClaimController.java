@@ -61,7 +61,7 @@ public class ClaimController {
     @GetMapping("/insurances/claims/guilty")
     @PreAuthorize(UserRoles.LOGGED_USER)
     public ResponseEntity<List<ClaimResponseDTO>> getClaimsGultyByUserName(HttpServletRequest headers) {
-        List<Claim> claimsResponse = claimServiceInterface.getClaimsGultyByUserName(utility.getUserHeader(headers));
+        List<Claim> claimsResponse = claimServiceInterface.getClaimsGuiltyByUserName(utility.getUserHeader(headers));
         List<ClaimResponseDTO> claimsResponseDTO = new ArrayList<>();
         if (claimsResponse.size() == 0) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(claimsResponseDTO);

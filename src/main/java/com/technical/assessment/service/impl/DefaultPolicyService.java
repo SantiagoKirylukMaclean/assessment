@@ -1,7 +1,7 @@
 package com.technical.assessment.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.technical.assessment.model.Claim;
+
 import com.technical.assessment.model.Insurance;
 import com.technical.assessment.model.Policy;
 import com.technical.assessment.model.User;
@@ -12,7 +12,6 @@ import com.technical.assessment.service.UserServiceInterface;
 import com.technical.assessment.utils.TextMessages;
 import com.technical.assessment.utils.Utility;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -54,17 +54,17 @@ public class DefaultPolicyService implements PolicyServiceInterface {
     }
 
     public List<Policy> getPoliciesByUsername(String username) {
-        User user = userServiceInterface.getUserByUserName(username).orElse(new User());
+        User user = userServiceInterface.getUserByUserName(username).orElseThrow(NoSuchElementException::new);
         return policyRepository.findAll().stream()
                 .filter(p -> p.getInsurance().getId().equals(user.getInsurance().getId()))
                 .collect(Collectors.toList());
     }
 
     public Policy getPolicyByUsername(String username, String id) {
-        User user = userServiceInterface.getUserByUserName(username).orElse(new User());
+        User user = userServiceInterface.getUserByUserName(username).orElseThrow(NoSuchElementException::new);
         return policyRepository.findAll().stream()
                 .filter(p -> p.getInsurance().getId().equals(user.getInsurance().getId()))
-                .filter(p -> p.getId().equals(Long.parseLong(id))).findFirst().orElse(new Policy());
+                .filter(p -> p.getId().equals(Long.parseLong(id))).findFirst().orElseThrow(NoSuchElementException::new);
     }
 
     public Policy savePolicy(Policy policy, String username) {
@@ -80,7 +80,7 @@ public class DefaultPolicyService implements PolicyServiceInterface {
         Optional<User> userHeader = userServiceInterface.getUserByUserName(username);
         Policy policy = policyRepository.findById(Long.parseLong(policyId)).orElse(new Policy());
         if (policy.getId() == null){
-            log.debug(TextMessages.OBJECT_NOT_EXIST);
+            log.debug(TextMessages.REQUEST_DATA_NOT_AVAILABLE);
             return new Policy();
         }
         if (!userHeader.get().getInsurance().getId().equals(policy.getInsurance().getId())) {
@@ -97,7 +97,7 @@ public class DefaultPolicyService implements PolicyServiceInterface {
         Optional<User> userHeader = userServiceInterface.getUserByUserName(username);
         Policy policy = policyRepository.findById(Long.parseLong(policyId)).orElse(new Policy());
         if (policy.getId() == null){
-            log.debug(TextMessages.OBJECT_NOT_EXIST);
+            log.debug(TextMessages.REQUEST_DATA_NOT_AVAILABLE);
             return new Policy();
         }
         if (!userHeader.get().getInsurance().getId().equals(policy.getInsurance().getId())) {

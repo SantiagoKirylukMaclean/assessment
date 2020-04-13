@@ -18,10 +18,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.swing.table.TableRowSorter;
 import java.util.Calendar;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -31,28 +33,28 @@ import java.util.stream.Collectors;
 public class DefaultClaimService implements ClaimServiceInterface {
 
     @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     @Autowired
-    private ClaimRepository claimRepository;
+    private final ClaimRepository claimRepository;
 
     @Autowired
-    private PolicyRepository policyRepository;
+    private final PolicyRepository policyRepository;
 
     @Autowired
-    private ModelMapper modelMapper;
+    private final ModelMapper modelMapper;
 
     @Autowired
-    private InsuranceRepository insuranceRepository;
+    private final InsuranceRepository insuranceRepository;
 
     @Autowired
-    private RoleRepository roleRepository;
+    private final RoleRepository roleRepository;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    private Utility utility;
+    private final Utility utility;
 
     public DefaultClaimService(UserRepository userRepository, ClaimRepository claimRepository,
                                PolicyRepository policyRepository, ModelMapper modelMapper,
@@ -69,28 +71,29 @@ public class DefaultClaimService implements ClaimServiceInterface {
     }
 
     public Claim getClaimsById(String headerUsername, String claimId) {
-        return claimRepository.findById(Long.parseLong(claimId)).orElse(new Claim());
+        return claimRepository.findById(Long.parseLong(claimId)).orElseThrow(NoSuchElementException::new);
     }
 
-    public List<Claim> getClaimsGultyByUserName(String username) {
+    public List<Claim> getClaimsGuiltyByUserName(String username) {
         Optional<User> user = userRepository.findByUsername(username);
         return claimRepository.findAll().stream()
                 .filter(cg -> cg.getPolicyGuilty().getInsurance().getId()
-                        .equals(user.orElse(new User()).getInsurance().getId())).collect(Collectors.toList());
+                        .equals(user.orElseThrow(NoSuchElementException::new).getInsurance().getId())).collect(Collectors.toList());
     }
 
     public List<Claim> getClaimsVictimByUserName(String username) {
         Optional<User> user = userRepository.findByUsername(username);
         return claimRepository.findAll().stream()
                 .filter(cg -> cg.getPolicyVictim().getInsurance().getId()
-                        .equals(user.orElse(new User()).getInsurance().getId()))
+                        .equals(user.orElseThrow(NoSuchElementException::new).getInsurance().getId()))
                 .collect(Collectors.toList());
     }
 
     public Claim addClaim(Claim claim, String username) {
         if (claim.getPolicyGuilty().getId().equals(claim.getPolicyVictim().getId())) {
             log.debug(TextMessages.POLICIES_ARE_SAME);
-            return new Claim();
+            //return new Claim();
+            throw new NoSuchElementException();
         }
         User userHeader = userRepository.findByUsername(username).orElse(new User());
         claim.setPolicyVictim(policyRepository.findById(claim.getPolicyVictim().getId()).orElse(new Policy()));

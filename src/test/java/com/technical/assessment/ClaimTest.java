@@ -12,7 +12,7 @@ public class ClaimTest extends BeforeSetUpTest {
     @DisplayName("Test getClaimsGultyByUserName")
     @Test
     public void getClaimsGultyByUserName() {
-        assertEquals(1,defaultClaimService.getClaimsGultyByUserName("Sallia").size());
+        assertEquals(1,defaultClaimService.getClaimsGuiltyByUserName("Sallia").size());
     }
 
     @DisplayName("Test getClaimsVictimByUserName")
