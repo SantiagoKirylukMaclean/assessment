@@ -2,7 +2,7 @@ package com.technical.assessment.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import com.technical.assessment.model.Insurance;
+import com.technical.assessment.error.CustomAssessmentException;
 import com.technical.assessment.model.Policy;
 import com.technical.assessment.model.User;
 import com.technical.assessment.repository.InsuranceRepository;
@@ -69,44 +69,41 @@ public class DefaultPolicyService implements PolicyServiceInterface {
 
     public Policy savePolicy(Policy policy, String username) {
         Optional<User> user = userServiceInterface.getUserByUserName(username);
-        policy.setInsurance(insuranceRepository.findById(user.orElse(new User()).getInsurance().getId())
-                .orElse(new Insurance()));
+        policy.setInsurance(insuranceRepository.findById(user.orElseThrow(NoSuchElementException::new).getInsurance().getId())
+                .orElseThrow(NoSuchElementException::new));
         policy.setModifyDateTime(Calendar.getInstance());
         policyRepository.save(policy);
         return policy;
     }
 
-    public Policy savePolicy(Map<String, Object> updates, String username, String policyId) {
+    public Policy savePolicy(Map<String, Object> updates, String username, String policyId) throws CustomAssessmentException {
         Optional<User> userHeader = userServiceInterface.getUserByUserName(username);
-        Policy policy = policyRepository.findById(Long.parseLong(policyId)).orElse(new Policy());
-        if (policy.getId() == null){
-            log.debug(TextMessages.REQUEST_DATA_NOT_AVAILABLE);
-            return new Policy();
-        }
-        if (!userHeader.get().getInsurance().getId().equals(policy.getInsurance().getId())) {
-            log.debug(TextMessages.LOGGED_USER_NOT_INSURANCE);
-            return new Policy();
-        }
+        Policy policy = policyRepository.findById(Long.parseLong(policyId)).orElseThrow(NoSuchElementException::new);
+        checkPolicyExist(userHeader,policy);
         policy = objectMapper.convertValue(utility.modifyField(updates, policy), Policy.class);
         policy.setModifyDateTime(Calendar.getInstance());
         policyRepository.save(policy);
         return policy;
     }
 
-    public Policy savePolicy(Policy policyUpdate, String username, String policyId) {
+    public Policy savePolicy(Policy policyUpdate, String username, String policyId) throws CustomAssessmentException {
         Optional<User> userHeader = userServiceInterface.getUserByUserName(username);
-        Policy policy = policyRepository.findById(Long.parseLong(policyId)).orElse(new Policy());
-        if (policy.getId() == null){
-            log.debug(TextMessages.REQUEST_DATA_NOT_AVAILABLE);
-            return new Policy();
-        }
-        if (!userHeader.get().getInsurance().getId().equals(policy.getInsurance().getId())) {
-            log.debug(TextMessages.LOGGED_USER_NOT_INSURANCE);
-            return new Policy();
-        }
+        Policy policy = policyRepository.findById(Long.parseLong(policyId)).orElseThrow(NoSuchElementException::new);
+        checkPolicyExist(userHeader,policy);
         policyUpdate.setId(policy.getId());
         policyUpdate.setModifyDateTime(Calendar.getInstance());
         policyUpdate.setInsurance(userHeader.orElse(new User()).getInsurance());
         return policyRepository.save(policyUpdate);
+    }
+
+    private void checkPolicyExist(Optional<User> userHeader, Policy policy) throws CustomAssessmentException {
+        if (policy.getId() == null){
+            log.debug(TextMessages.REQUEST_DATA_NOT_AVAILABLE);
+            throw new CustomAssessmentException(TextMessages.REQUEST_DATA_NOT_AVAILABLE);
+        }
+        if (!userHeader.get().getInsurance().getId().equals(policy.getInsurance().getId())) {
+            log.debug(TextMessages.LOGGED_USER_NOT_INSURANCE);
+            throw new CustomAssessmentException(TextMessages.LOGGED_USER_NOT_INSURANCE);
+        }
     }
 }

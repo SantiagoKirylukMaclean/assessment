@@ -20,10 +20,20 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(NoSuchElementException.class)
     protected ResponseEntity<Object> noSuchElementException(NoSuchElementException ex, WebRequest request) {
 
-        CustomRestExceptionHandler errors = new CustomRestExceptionHandler();
+        CustomAssessmentExceptionMessage errors = new CustomAssessmentExceptionMessage();
         errors.setTimestamp(LocalDateTime.now());
         errors.setError(TextMessages.REQUEST_DATA_NOT_AVAILABLE);
 
         return new ResponseEntity<>(errors, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(CustomAssessmentException.class)
+    protected ResponseEntity<Object> noSuchElementException(CustomAssessmentException ce) {
+
+        CustomAssessmentExceptionMessage errors = new CustomAssessmentExceptionMessage();
+        errors.setTimestamp(LocalDateTime.now());
+        errors.setError(ce.getMessage());
+
+        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
 }

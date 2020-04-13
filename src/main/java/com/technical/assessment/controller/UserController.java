@@ -1,5 +1,6 @@
 package com.technical.assessment.controller;
 
+import com.technical.assessment.error.CustomAssessmentException;
 import com.technical.assessment.model.Role;
 import com.technical.assessment.model.User;
 import com.technical.assessment.model.dto.UserRequestDTO;
@@ -71,7 +72,7 @@ public class UserController {
     @PostMapping(value = "/insurances/user", consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize(UserRoles.LOGGED_PRODUCT_MANAGER)
     public ResponseEntity<UserResponseDTO> addUser(@Valid @RequestBody UserRequestDTO userRequestDTO,
-                                                   HttpServletRequest headers) {
+                                                   HttpServletRequest headers) throws CustomAssessmentException {
         User userResponse = userServiceInterface
                 .addUser(modelMapper.map(userRequestDTO, User.class), utility.getUserHeader(headers), userRequestDTO.getRoles());
         if (userResponse.getId() == null) {
@@ -84,7 +85,7 @@ public class UserController {
     @PreAuthorize(UserRoles.LOGGED_PRODUCT_MANAGER)
     public ResponseEntity<UserResponseDTO> saveUser(@RequestBody Map<String, Object> updates,
                                                     @PathVariable("id") String id,
-                                                    HttpServletRequest headers) {
+                                                    HttpServletRequest headers) throws CustomAssessmentException {
         User userResponse = userServiceInterface.saveUser(updates, id, utility.getUserHeader(headers));
         if (userResponse.getId() == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(modelMapper.map(userResponse, UserResponseDTO.class));
@@ -96,7 +97,7 @@ public class UserController {
     @PreAuthorize(UserRoles.LOGGED_PRODUCT_MANAGER)
     public ResponseEntity<UserResponseDTO> modifyUser(@Valid @RequestBody UserRequestDTO userRequestDTO,
                                                       HttpServletRequest headers,
-                                                      @PathVariable("id") String id) {
+                                                      @PathVariable("id") String id) throws CustomAssessmentException {
 
         User userResponse = userServiceInterface
                 .alterUser(modelMapper.map(userRequestDTO, User.class), utility.getUserHeader(headers), id,

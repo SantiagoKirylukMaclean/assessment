@@ -1,5 +1,6 @@
 package com.technical.assessment.controller;
 
+import com.technical.assessment.error.CustomAssessmentException;
 import com.technical.assessment.model.Policy;
 import com.technical.assessment.model.dto.PolicyRequestDTO;
 import com.technical.assessment.model.dto.PolicyResponseDTO;
@@ -83,7 +84,7 @@ public class PoliciyController {
     @PreAuthorize(UserRoles.LOGGED_PRODUCT_MANAGER)
     public ResponseEntity<PolicyResponseDTO> savePolicy(@RequestBody Map<String, Object> updates,
                                                         HttpServletRequest headers,
-                                                        @PathVariable("id") String id) {
+                                                        @PathVariable("id") String id) throws CustomAssessmentException {
         Policy policyResponse = policyServiceInterface.savePolicy(updates, utility.getUserHeader(headers), id);
         if (policyResponse.getId() == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -98,7 +99,7 @@ public class PoliciyController {
     @PreAuthorize(UserRoles.LOGGED_USER)
     public ResponseEntity<PolicyResponseDTO> modifyPolicy(@Valid @RequestBody PolicyRequestDTO policyRequestDTO,
                                                           HttpServletRequest headers,
-                                                          @PathVariable("id") String id) {
+                                                          @PathVariable("id") String id) throws CustomAssessmentException {
         Policy policyResponse = policyServiceInterface.savePolicy(modelMapper.map(policyRequestDTO, Policy.class),
                 utility.getUserHeader(headers),
                 id);

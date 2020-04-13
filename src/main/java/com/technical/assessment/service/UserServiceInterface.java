@@ -1,5 +1,6 @@
 package com.technical.assessment.service;
 
+import com.technical.assessment.error.CustomAssessmentException;
 import com.technical.assessment.model.User;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +15,7 @@ public interface UserServiceInterface {
     List<User> getUsersByUserName(String username);
     Optional<User> getUserByUserName(String username);
     User getUserByUserNameAndId(String username, String id);
-    User addUser(User user, String username, Set<String> rolesUpdate);
-    User saveUser(Map<String, Object> updates, String id, String username);
-    User alterUser(User userUpdate, String username, String userId, Set<String> rolesUpdate);
+    User addUser(User user, String username, Set<String> rolesUpdate) throws CustomAssessmentException;
+    User saveUser(Map<String, Object> updates, String id, String username) throws CustomAssessmentException;
+    User alterUser(User userUpdate, String username, String userId, Set<String> rolesUpdate) throws CustomAssessmentException;
 }

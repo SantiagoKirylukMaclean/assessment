@@ -1,5 +1,6 @@
 package com.technical.assessment.controller;
 
+import com.technical.assessment.error.CustomAssessmentException;
 import com.technical.assessment.model.Claim;
 import com.technical.assessment.model.Negotiation;
 import com.technical.assessment.model.Policy;
@@ -111,7 +112,7 @@ public class ClaimController {
     @PreAuthorize(UserRoles.LOGGED_USER)
     public ResponseEntity<ClaimResponseDTO> rejectClaim(@Valid @RequestBody RejectRequestDTO rejectRequestDTO,
                                                         HttpServletRequest headers,
-                                                        @PathVariable("id") String id) {
+                                                        @PathVariable("id") String id) throws CustomAssessmentException {
         Claim claimResponse = claimServiceInterface.rejectClaim(id, modelMapper.map(rejectRequestDTO, Negotiation.class),
                 utility.getUserHeader(headers));
         if (claimResponse.getId() == null) {
@@ -136,7 +137,7 @@ public class ClaimController {
     @PreAuthorize(UserRoles.LOGGED_PRODUCT_MANAGER)
     public ResponseEntity<ClaimResponseDTO> reachClaim(@Valid @RequestBody ClaimReachRequestDTO claimReachRequestDTO,
                                                        HttpServletRequest headers,
-                                                       @PathVariable("id") String id) {
+                                                       @PathVariable("id") String id) throws CustomAssessmentException {
         Claim claimResponse = claimServiceInterface.reachClaim(id, modelMapper.map(claimReachRequestDTO, Negotiation.class),
                 utility.getUserHeader(headers));
         if (claimResponse.getId() == null) {

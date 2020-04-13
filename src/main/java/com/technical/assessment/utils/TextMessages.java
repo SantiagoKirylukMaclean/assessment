@@ -11,7 +11,7 @@ public class TextMessages {
     public static final String PROPOSAL_AMOUNT_LOWER = "The amount of proposal is less than previous";
     public static final String POLICIES_ARE_SAME = "The policies do not be same";
     public static final String REQUEST_DATA_NOT_AVAILABLE = "The requested data is not available";
-    public static final String USER_EXIST = "The object has not find it";
+    public static final String USER_EXIST = "Please chose other username";
 
 
 }

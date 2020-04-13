@@ -1,5 +1,6 @@
 package com.technical.assessment.controller;
 
+import com.technical.assessment.error.CustomAssessmentException;
 import com.technical.assessment.model.Claim;
 import com.technical.assessment.model.Insurance;
 import com.technical.assessment.model.Negotiation;
@@ -76,7 +77,7 @@ public class InsuranceController {
     @PutMapping(value = "/insurances", consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize(UserRoles.LOGGED_SUPERVISOR)
     public ResponseEntity<Insurance> modifyInsurance(@Valid @RequestBody InsuranceRequestDTO insuranceRequestDTO,
-                                                     HttpServletRequest headers) {
+                                                     HttpServletRequest headers) throws CustomAssessmentException {
         Insurance insuranceResponse = insuranceServiceInterface.updateInsurance(modelMapper.map(insuranceRequestDTO, Insurance.class),
                 utility.getUserHeader(headers));
         if (insuranceResponse.getId() == null) {

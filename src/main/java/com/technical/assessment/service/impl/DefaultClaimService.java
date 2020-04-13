@@ -1,5 +1,6 @@
 package com.technical.assessment.service.impl;
 
+import com.technical.assessment.error.CustomAssessmentException;
 import com.technical.assessment.model.Claim;
 import com.technical.assessment.model.Negotiation;
 import com.technical.assessment.model.Policy;
@@ -18,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.swing.table.TableRowSorter;
 import java.util.Calendar;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -89,12 +89,13 @@ public class DefaultClaimService implements ClaimServiceInterface {
                 .collect(Collectors.toList());
     }
 
-    public Claim addClaim(Claim claim, String username) {
+    public Claim addClaim(Claim claim, String username) throws CustomAssessmentException {
         if (claim.getPolicyGuilty().getId().equals(claim.getPolicyVictim().getId())) {
             log.debug(TextMessages.POLICIES_ARE_SAME);
-            //return new Claim();
-            throw new NoSuchElementException();
+            throw new CustomAssessmentException(TextMessages.POLICIES_ARE_SAME);
         }
+
+
         User userHeader = userRepository.findByUsername(username).orElse(new User());
         claim.setPolicyVictim(policyRepository.findById(claim.getPolicyVictim().getId()).orElse(new Policy()));
         claim.setPolicyGuilty(policyRepository.findById(claim.getPolicyGuilty().getId()).orElse(new Policy()));
@@ -102,15 +103,15 @@ public class DefaultClaimService implements ClaimServiceInterface {
         List<Policy> policies = policyRepository.findAll();
         Policy policyGuilty = policies.stream()
                 .filter(policy -> claim.getPolicyGuilty().getId().equals(policy.getId()))
-                .findAny().orElse(null);
+                .findAny().orElseThrow(NoSuchElementException::new);
         Policy policyVictim = policies.stream()
                 .filter(policy -> claim.getPolicyVictim().getId().equals(policy.getId()))
-                .findAny().orElse(null);
+                .findAny().orElseThrow(NoSuchElementException::new);
 
         //Check if insurace of user is the same of policyVictim
         if (!userHeader.getInsurance().getId().equals(policyVictim.getInsurance().getId())) {
             log.debug(TextMessages.LOGGED_USER_NOT_INSURANCE);
-            return new Claim();
+            throw new CustomAssessmentException(TextMessages.LOGGED_USER_NOT_INSURANCE);
         }
 
         //Check is booth insuranse as same
@@ -128,19 +129,19 @@ public class DefaultClaimService implements ClaimServiceInterface {
         return claim;
     }
 
-    public Claim rejectClaim(String claimId, Negotiation negotiation, String username) {
+    public Claim rejectClaim(String claimId, Negotiation negotiation, String username) throws CustomAssessmentException {
         Optional<User> userHeader = userRepository.findByUsername(username);
-        Claim claim = claimRepository.findById(Long.parseLong(claimId)).orElse(new Claim());
+        Claim claim = claimRepository.findById(Long.parseLong(claimId)).orElseThrow(NoSuchElementException::new);
 
         if (claim.getState() != 1) {
             log.debug(TextMessages.CLAIM_STATE_NOT_OFFERED);
-            return new Claim();
+            throw new CustomAssessmentException(TextMessages.CLAIM_STATE_NOT_OFFERED);
         }
 
-        //Check if insurace of user is the same od policyGuilty
+        //Check if insurance of user is the same od policyGuilty
         if (!userHeader.orElse(new User()).getInsurance().getId().equals(claim.getPolicyGuilty().getInsurance().getId())) {
             log.debug(TextMessages.LOGGED_USER_NOT_INSURANCE);
-            return new Claim();
+            throw new CustomAssessmentException(TextMessages.LOGGED_USER_NOT_INSURANCE);
         }
         Double lasAmountProposal = getlastAmountProposal(claim);
         updateClaim(claim, 2);
@@ -150,20 +151,20 @@ public class DefaultClaimService implements ClaimServiceInterface {
         return claim;
     }
 
-    public Claim reachClaim(String claimId, Negotiation negotiation, String username) {
+    public Claim reachClaim(String claimId, Negotiation negotiation, String username) throws CustomAssessmentException {
         Optional<User> userHeader = userRepository.findByUsername(username);
-        Claim claim = claimRepository.findById(Long.parseLong(claimId)).orElse(new Claim());
+        Claim claim = claimRepository.findById(Long.parseLong(claimId)).orElseThrow(NoSuchElementException::new);
 
         //Check if state is offered
         if (claim.getState() != 1) {
             log.debug(TextMessages.CLAIM_STATE_NOT_OFFERED);
-            return new Claim();
+            throw new CustomAssessmentException(TextMessages.CLAIM_STATE_NOT_OFFERED);
         }
 
         //Check if insurace of user is the same od policyGuilty
         if (!userHeader.get().getInsurance().getId().equals(claim.getPolicyGuilty().getInsurance().getId())) {
             log.debug(TextMessages.LOGGED_USER_NOT_INSURANCE);
-            return new Claim();
+            throw new CustomAssessmentException(TextMessages.LOGGED_USER_NOT_INSURANCE);
         }
         Double lastAmountProposal = getlastAmountProposal(claim);
         updateClaim(claim, 3);

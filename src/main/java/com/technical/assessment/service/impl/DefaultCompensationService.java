@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -34,7 +35,8 @@ public class DefaultCompensationService implements CompensationServiceInterface 
         List<Compensation> compensations = new ArrayList<>();
         Optional<User> headerUser = userRepository.findByUsername(headerUsername);
         List<Claim> closedClimes = claimRepository.findAll().stream()
-                .filter(claim -> claim.getPolicyVictim().getInsurance().getId().equals(headerUser.orElse(new User()).getInsurance().getId()))
+                .filter(claim -> claim.getPolicyVictim().getInsurance().getId()
+                        .equals(headerUser.orElseThrow(NoSuchElementException::new).getInsurance().getId()))
                 .filter(claim -> claim.getState() == 3).collect(Collectors.toList());
         if (closedClimes.size() > 0) {
 
@@ -42,7 +44,7 @@ public class DefaultCompensationService implements CompensationServiceInterface 
                 //TODO: Review asignation.
                 Compensation compensation = new Compensation();
                 compensation.setCompensationAmount(claim.getNegotiations().stream()
-                        .max(Comparator.comparing(Negotiation::getId)).orElse(new Negotiation()).getAmount());
+                        .max(Comparator.comparing(Negotiation::getId)).orElseThrow(NoSuchElementException::new).getAmount());
                 compensation.setModifyDateTime(claim.getModifyDateTime());
                 compensation.setClaimId(claim.getId());
                 compensations.add(compensation);

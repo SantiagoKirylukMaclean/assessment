@@ -1,6 +1,7 @@
 package com.technical.assessment.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.technical.assessment.error.CustomAssessmentException;
 import com.technical.assessment.model.Insurance;
 import com.technical.assessment.model.Role;
 import com.technical.assessment.model.User;
@@ -59,26 +60,26 @@ public class DefaultUserService implements UserServiceInterface {
     public List<User> getUsersByUserName(String username) {
         Optional<User> userHeader = this.getUserByUserName(username);
         return userRepository.findAll().stream()
-                .filter(u -> u.getInsurance().getId().equals(userHeader.orElse(new User()).getInsurance().getId())).
+                .filter(u -> u.getInsurance().getId().equals(userHeader.orElseThrow(NoSuchElementException::new).getInsurance().getId())).
                         collect(Collectors.toList());
     }
 
     public User getUserByUserNameAndId(String username, String id) {
         Optional<User> userHeader = this.getUserByUserName(username);
         return userRepository.findAll().stream()
-                .filter(u -> Objects.equals(u.getInsurance().getId(), userHeader.orElse(new User()).getInsurance().getId()))
-                .filter(p -> p.getId().equals(Long.parseLong(id))).findFirst().orElse(new User());
+                .filter(u -> Objects.equals(u.getInsurance().getId(), userHeader.orElseThrow(NoSuchElementException::new).getInsurance().getId()))
+                .filter(p -> p.getId().equals(Long.parseLong(id))).findFirst().orElseThrow(NoSuchElementException::new);
     }
 
-    public User addUser(User user, String username, Set<String> rolesUpdate) {
+    public User addUser(User user, String username, Set<String> rolesUpdate) throws CustomAssessmentException {
         Optional<User> userHeader = this.getUserByUserName(username);
-        Optional<User> newUser = this.getUserByUserName(user.getUsername());
-        if (user.getUsername().equals(newUser.orElse(new User()).getUsername())) {
+        if (this.getUserByUserName(user.getUsername()).isPresent()) {
             log.debug(TextMessages.USER_EXIST);
-            return new User();
+            throw new CustomAssessmentException(TextMessages.USER_EXIST);
         }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setInsurance(insuranceRepository.findById(userHeader.orElse(new User()).getInsurance().getId()).orElse(new Insurance()));
+        user.setInsurance(insuranceRepository.findById(userHeader.orElseThrow(NoSuchElementException::new)
+                .getInsurance().getId()).orElseThrow(NoSuchElementException::new));
         user.setActive(1);
         user.setModifyDateTime(Calendar.getInstance());
         user.setRoles(new HashSet<Role>(getRolesFromArray(rolesUpdate)));
@@ -86,31 +87,26 @@ public class DefaultUserService implements UserServiceInterface {
         return user;
     }
 
-    public User alterUser(User userUpdate, String username, String userId, Set<String> rolesUpdate) {
-
-        if (userUpdate.getUsername()
-                .equals(this.getUserByUserName(userUpdate.getUsername()).orElse(new User()).getUsername())) {
+    public User alterUser(User userUpdate, String username, String userId, Set<String> rolesUpdate) throws CustomAssessmentException {
+        if (this.getUserByUserName(userUpdate.getUsername()).isPresent()) {
             log.debug(TextMessages.USER_EXIST);
-            return new User();
+            throw new CustomAssessmentException(TextMessages.USER_EXIST);
         }
         userUpdate.setId(Long.parseLong(userId));
-        userUpdate.setInsurance(insuranceRepository.findById(this.getUserByUserName(username).orElse(new User()).getInsurance().getId()).orElse(new Insurance()));
+        userUpdate.setInsurance(insuranceRepository.findById(this.getUserByUserName(username)
+                .orElseThrow(NoSuchElementException::new).getInsurance().getId()).orElseThrow(NoSuchElementException::new));
         userUpdate.setActive(1);
         userUpdate.setModifyDateTime(Calendar.getInstance());
         userUpdate.setRoles(new HashSet<Role>(getRolesFromArray(rolesUpdate)));
         return userRepository.save(userUpdate);
     }
 
-    public User saveUser(Map<String, Object> updates, String id, String username) {
+    public User saveUser(Map<String, Object> updates, String id, String username) throws CustomAssessmentException {
         Optional<User> userHeader = this.getUserByUserName(username);
-        User user = userRepository.findById(Long.parseLong(id)).orElse(new User());
-        if (user.getId() == null){
-            log.debug(TextMessages.REQUEST_DATA_NOT_AVAILABLE);
-            return new User();
-        }
+        User user = userRepository.findById(Long.parseLong(id)).orElseThrow(NoSuchElementException::new);
         if (!userHeader.orElse(new User()).getInsurance().getId().equals(user.getInsurance().getId())) {
             log.debug(TextMessages.LOGGED_USER_NOT_INSURANCE);
-            return new User();
+            throw new CustomAssessmentException(TextMessages.LOGGED_USER_NOT_INSURANCE);
         }
         user = objectMapper.convertValue(utility.modifyField(updates, user), User.class);
         user.setModifyDateTime(Calendar.getInstance());

@@ -1,5 +1,6 @@
 package com.technical.assessment.service;
 
+import com.technical.assessment.error.CustomAssessmentException;
 import com.technical.assessment.model.Policy;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +13,6 @@ public interface PolicyServiceInterface {
     List<Policy> getPoliciesByUsername(String username);
     Policy getPolicyByUsername(String username, String id);
     Policy savePolicy(Policy policy, String username);
-    Policy savePolicy(Map<String, Object> updates, String username, String policyId);
-    Policy savePolicy(Policy policyUpdate, String username, String policyId);
+    Policy savePolicy(Map<String, Object> updates, String username, String policyId) throws CustomAssessmentException;
+    Policy savePolicy(Policy policyUpdate, String username, String policyId) throws CustomAssessmentException;
 }

@@ -1,6 +1,7 @@
 package com.technical.assessment.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.technical.assessment.error.CustomAssessmentException;
 import com.technical.assessment.model.Insurance;
 import com.technical.assessment.model.User;
 import com.technical.assessment.repository.InsuranceRepository;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Calendar;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Slf4j
@@ -47,7 +49,7 @@ public class DefaultInsuranceService implements InsuranceServiceInterface {
         if(userOptional.isPresent()) {
             insurance = insuranceRepository.findAll().stream()
                     .filter(i -> i.getId().equals(userOptional.get().getInsurance().getId()))
-                    .findFirst().orElse(new Insurance());
+                    .findFirst().orElseThrow(NoSuchElementException::new);
         }
         return insurance;
     }
@@ -58,7 +60,7 @@ public class DefaultInsuranceService implements InsuranceServiceInterface {
         if(userOptional.isPresent()) {
             insurance = insuranceRepository.
                     findById(Long.parseLong(userOptional.get().getInsurance().getId().toString()))
-                    .orElse(new Insurance());
+                    .orElseThrow(NoSuchElementException::new);
             insurance = objectMapper.convertValue(utility.modifyField(updates, insurance), Insurance.class);
             insurance.setModifyDateTime(Calendar.getInstance());
             insuranceRepository.save(insurance);
@@ -66,17 +68,17 @@ public class DefaultInsuranceService implements InsuranceServiceInterface {
         return insurance;
     }
 
-    public Insurance updateInsurance(Insurance insuranceUpdate, String username) {
+    public Insurance updateInsurance(Insurance insuranceUpdate, String username) throws CustomAssessmentException {
         Optional<User> userHeader = userServiceInterface.getUserByUserName(username);
-        Insurance insurance = insuranceRepository.findById(userHeader.orElse(new User()).getInsurance().getId())
-                .orElse(new Insurance());
+        Insurance insurance = insuranceRepository.findById(userHeader.orElseThrow(NoSuchElementException::new)
+                .getInsurance().getId()).orElseThrow(NoSuchElementException::new);
         if (insurance.getId() == null){
             log.debug(TextMessages.REQUEST_DATA_NOT_AVAILABLE);
-            return new Insurance();
+            throw new CustomAssessmentException(TextMessages.REQUEST_DATA_NOT_AVAILABLE);
         }
         if (!userHeader.get().getInsurance().getId().equals(insurance.getId())) {
             log.debug(TextMessages.LOGGED_USER_NOT_INSURANCE);
-            return new Insurance();
+            throw new CustomAssessmentException(TextMessages.LOGGED_USER_NOT_INSURANCE);
         }
         insuranceUpdate.setId(insurance.getId());
         insuranceUpdate.setModifyDateTime(Calendar.getInstance());
