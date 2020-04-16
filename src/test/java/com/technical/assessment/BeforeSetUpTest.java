@@ -10,48 +10,86 @@ import com.technical.assessment.repository.UserRepository;
 import com.technical.assessment.service.UserServiceInterface;
 import com.technical.assessment.service.impl.DefaultClaimService;
 import com.technical.assessment.service.impl.DefaultInsuranceService;
+import io.swagger.models.auth.In;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.event.annotation.BeforeTestExecution;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
+@SpringBootTest
 
+@Suite.SuiteClasses({ BeforeSetUpTest.class, Claim.class, Insurance.class })
 public class BeforeSetUpTest {
 
-    @InjectMocks
-    DefaultInsuranceService defaultInsuranceService;
 
     @InjectMocks
-    DefaultClaimService defaultClaimService;
+    static DefaultInsuranceService defaultInsuranceService;
+
+    @InjectMocks
+    static DefaultClaimService defaultClaimService;
 
     @Mock
-    InsuranceRepository insuranceRepository;
+    private static InsuranceRepository insuranceRepository;
 
     @Mock
-    UserServiceInterface userServiceInterface;
+    private static UserServiceInterface userServiceInterface;
 
     @Mock
-    ClaimRepository claimRepository;
+    private static ClaimRepository claimRepository;
 
     @Mock
-    UserRepository userRepository;
+    private static UserRepository userRepository;
 
 
-    @BeforeEach
-    public void setUp() {
+    @BeforeClass
+    public static void setUp() {
 
-        List<Claim> claims = new ArrayList<>();//
-        Claim claim = new Claim();//
+        List<Insurance> insurances = setInsurances();
+        List<Policy> policies = setPolicies(insurances);
+        List<Claim> claims = setClaims(policies);
+        List<User> users = setUsers(insurances);
 
-        Policy policyGuilty = new Policy();//
-        Policy policyVictim = new Policy();//
+        when(insuranceRepository.findAll()).thenReturn(insurances);
+        when(claimRepository.findAll()).thenReturn(claims);
+        when(userServiceInterface.getUserByUserName("Sallia")).thenReturn(Optional.of(users.get(0)));
+        when(userRepository.findByUsername("Sallia")).thenReturn(Optional.of(users.get(0)));
 
+    }
+
+    private static List<Claim> setClaims(List<Policy> policies) {
+
+        List<Claim> claims = new ArrayList<>();
+        Claim claim = new Claim();
+        claim.setId(1L);
+        claim.setPolicyGuilty(policies.get(0));
+        claim.setPolicyVictim(policies.get(1));
+        claims.add(claim);
+
+        return claims;
+    }
+
+    private void setCompensations() {
+
+    }
+
+    private static List<Insurance> setInsurances() {
         List<Insurance> insurances = new ArrayList<>();//
 
         Insurance insuranceSallia = new Insurance();//
@@ -78,30 +116,166 @@ public class BeforeSetUpTest {
         insurances.add(insuranceSallia);
         insurances.add(insuranceRotular);
         insurances.add(insuranceXenix);
+        return insurances;
+    }
 
-        when(insuranceRepository.findAll()).thenReturn(insurances);
+    private static List<Policy> setPolicies(List<Insurance> insurances) {
+        List<Policy> policies = new ArrayList<>();
 
-        policyGuilty.setId(1L);//
-        policyGuilty.setPolicieDescription("House");//
-        policyGuilty.setCoveredName("Sebastina");//
-        policyGuilty.setCoveredLastName("Frutos");//
-        policyGuilty.setCoveredEmail("sebastian@frutos");//
-        policyGuilty.setInsurance(insuranceSallia);//
+        Policy policy1L = new Policy();//
+        policy1L.setId(1L);//
+        policy1L.setPolicieDescription("House");//
+        policy1L.setCoveredName("Sebastina");//
+        policy1L.setCoveredLastName("Frutos");//
+        policy1L.setCoveredEmail("sebastian@frutos");//
+        policy1L.setInsurance(insurances.get(0));//
 
-        policyVictim.setId(2L);//
-        policyVictim.setPolicieDescription("Car");//
-        policyVictim.setCoveredName("Sergio");//
-        policyVictim.setCoveredLastName("Almirón");//
-        policyVictim.setCoveredEmail("sergio@Almiron");//
-        policyVictim.setInsurance(insuranceRotular);//
+        Policy policy2L = new Policy();//
+        policy2L.setId(2L);//
+        policy2L.setPolicieDescription("Car");//
+        policy2L.setCoveredName("Sergio");//
+        policy2L.setCoveredLastName("Almirón");//
+        policy2L.setCoveredEmail("sergio@Almiron");//
+        policy2L.setInsurance(insurances.get(0));//
 
-        claim.setId(1L);//
-        claim.setPolicyGuilty(policyGuilty);//
-        claim.setPolicyVictim(policyVictim);//
-        claims.add(claim);//
+        /*
 
-        when(claimRepository.findAll()).thenReturn(claims);//
+        Policy policy3L = new Policy();//
+        policy3L.setId(3L);//
+        policy3L.setPolicieDescription("House");//
+        policy3L.setCoveredName("Sebastina");//
+        policy3L.setCoveredLastName("Frutos");//
+        policy3L.setCoveredEmail("sebastian@frutos");//
+        policy3L.setInsurance(insurances.get(0));//
 
+        Policy policy4L = new Policy();//
+        policy4L.setId(1L);//
+        policy4L.setPolicieDescription("House");//
+        policy4L.setCoveredName("Sebastina");//
+        policy4L.setCoveredLastName("Frutos");//
+        policy4L.setCoveredEmail("sebastian@frutos");//
+        policy4L.setInsurance(insurances.get(0));//
+
+        Policy policy5L = new Policy();//
+        policy5L.setId(1L);//
+        policy5L.setPolicieDescription("House");//
+        policy5L.setCoveredName("Sebastina");//
+        policy5L.setCoveredLastName("Frutos");//
+        policy5L.setCoveredEmail("sebastian@frutos");//
+        policy5L.setInsurance(insurances.get(0));//
+
+        Policy policy1L = new Policy();//
+        policy1L.setId(1L);//
+        policy1L.setPolicieDescription("House");//
+        policy1L.setCoveredName("Sebastina");//
+        policy1L.setCoveredLastName("Frutos");//
+        policy1L.setCoveredEmail("sebastian@frutos");//
+        policy1L.setInsurance(insurances.get(0));//
+
+        Policy policy1L = new Policy();//
+        policy1L.setId(1L);//
+        policy1L.setPolicieDescription("House");//
+        policy1L.setCoveredName("Sebastina");//
+        policy1L.setCoveredLastName("Frutos");//
+        policy1L.setCoveredEmail("sebastian@frutos");//
+        policy1L.setInsurance(insurances.get(0));//
+
+        Policy policy1L = new Policy();//
+        policy1L.setId(1L);//
+        policy1L.setPolicieDescription("House");//
+        policy1L.setCoveredName("Sebastina");//
+        policy1L.setCoveredLastName("Frutos");//
+        policy1L.setCoveredEmail("sebastian@frutos");//
+        policy1L.setInsurance(insurances.get(0));//
+
+        Policy policy1L = new Policy();//
+        policy1L.setId(1L);//
+        policy1L.setPolicieDescription("House");//
+        policy1L.setCoveredName("Sebastina");//
+        policy1L.setCoveredLastName("Frutos");//
+        policy1L.setCoveredEmail("sebastian@frutos");//
+        policy1L.setInsurance(insurances.get(0));//
+
+        Policy policy1L = new Policy();//
+        policy1L.setId(1L);//
+        policy1L.setPolicieDescription("House");//
+        policy1L.setCoveredName("Sebastina");//
+        policy1L.setCoveredLastName("Frutos");//
+        policy1L.setCoveredEmail("sebastian@frutos");//
+        policy1L.setInsurance(insurances.get(0));//
+
+        Policy policy1L = new Policy();//
+        policy1L.setId(1L);//
+        policy1L.setPolicieDescription("House");//
+        policy1L.setCoveredName("Sebastina");//
+        policy1L.setCoveredLastName("Frutos");//
+        policy1L.setCoveredEmail("sebastian@frutos");//
+        policy1L.setInsurance(insurances.get(0));//
+
+        Policy policy1L = new Policy();//
+        policy1L.setId(1L);//
+        policy1L.setPolicieDescription("House");//
+        policy1L.setCoveredName("Sebastina");//
+        policy1L.setCoveredLastName("Frutos");//
+        policy1L.setCoveredEmail("sebastian@frutos");//
+        policy1L.setInsurance(insurances.get(0));//
+
+        Policy policy1L = new Policy();//
+        policy1L.setId(1L);//
+        policy1L.setPolicieDescription("House");//
+        policy1L.setCoveredName("Sebastina");//
+        policy1L.setCoveredLastName("Frutos");//
+        policy1L.setCoveredEmail("sebastian@frutos");//
+        policy1L.setInsurance(insurances.get(0));//
+
+        Policy policy1L = new Policy();//
+        policy1L.setId(1L);//
+        policy1L.setPolicieDescription("House");//
+        policy1L.setCoveredName("Sebastina");//
+        policy1L.setCoveredLastName("Frutos");//
+        policy1L.setCoveredEmail("sebastian@frutos");//
+        policy1L.setInsurance(insurances.get(0));//
+
+        Policy policy1L = new Policy();//
+        policy1L.setId(1L);//
+        policy1L.setPolicieDescription("House");//
+        policy1L.setCoveredName("Sebastina");//
+        policy1L.setCoveredLastName("Frutos");//
+        policy1L.setCoveredEmail("sebastian@frutos");//
+        policy1L.setInsurance(insurances.get(0));//
+
+        Policy policy1L = new Policy();//
+        policy1L.setId(1L);//
+        policy1L.setPolicieDescription("House");//
+        policy1L.setCoveredName("Sebastina");//
+        policy1L.setCoveredLastName("Frutos");//
+        policy1L.setCoveredEmail("sebastian@frutos");//
+        policy1L.setInsurance(insurances.get(0));//
+
+        Policy policy1L = new Policy();//
+        policy1L.setId(1L);//
+        policy1L.setPolicieDescription("House");//
+        policy1L.setCoveredName("Sebastina");//
+        policy1L.setCoveredLastName("Frutos");//
+        policy1L.setCoveredEmail("sebastian@frutos");//
+        policy1L.setInsurance(insurances.get(0));//
+
+        Policy policy1L = new Policy();//
+        policy1L.setId(1L);//
+        policy1L.setPolicieDescription("House");//
+        policy1L.setCoveredName("Sebastina");//
+        policy1L.setCoveredLastName("Frutos");//
+        policy1L.setCoveredEmail("sebastian@frutos");//
+        policy1L.setInsurance(insurances.get(0));//
+
+         */
+
+        policies.add(policy1L);
+        policies.add(policy2L);
+        return policies;
+    }
+
+    private static List<User> setUsers(List<Insurance> insurances) {
         List<User> users = new ArrayList<>();
 
         User user = new User();
@@ -111,14 +285,13 @@ public class BeforeSetUpTest {
         user.setEmail("john@nash.com");
         user.setName("John");
         user.setLastName("Nash");
-        user.setInsurance(insuranceSallia);
+        user.setInsurance(insurances.get(0));
         Optional<User> usero = Optional.of(user);
 
         users.add(user);
 
-        when(userServiceInterface.getUserByUserName("Sallia")).thenReturn(usero);
-        when(userRepository.findByUsername("Sallia")).thenReturn(usero);
-
+        return users;
     }
+
 
 }

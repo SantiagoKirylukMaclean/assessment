@@ -4,10 +4,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import static com.technical.assessment.BeforeSetUpTest.defaultClaimService;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@SpringBootTest
-public class ClaimTest extends BeforeSetUpTest {
+
+public class ClaimTest {
 
     @DisplayName("Test getClaimsGultyByUserName")
     @Test
@@ -18,7 +19,7 @@ public class ClaimTest extends BeforeSetUpTest {
     @DisplayName("Test getClaimsVictimByUserName")
     @Test
     public void getClaimsVictimByUserName() {
-        assertEquals(0,defaultClaimService.getClaimsVictimByUserName("Sallia").size());
+        assertEquals(0,defaultClaimService.getClaimsVictimByUserName("Rotular").size());
     }
 
 }

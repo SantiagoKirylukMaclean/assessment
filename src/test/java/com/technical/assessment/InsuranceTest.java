@@ -4,10 +4,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import static com.technical.assessment.BeforeSetUpTest.defaultInsuranceService;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@SpringBootTest
-public class InsuranceTest extends BeforeSetUpTest {
+
+public class InsuranceTest {
+
+
 
 
     @DisplayName("Test getInsuranceByUserName")
